@@ -1,0 +1,43 @@
+# DXライブラリ (C++ / Visual Studio) 用の .gitignore
+
+# Visual Studio関連の一時ファイル・キャッシュ
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# ビルド出力ディレクトリと生成物
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+
+# コンパイルされたオブジェクトファイルなど
+*.obj
+*.exe
+*.pdb
+*.ilk
+*.idb
+*.lib
+*.exp
+*.map
+*.res
+*.tlb
+*.tlh
+*.bak
+*.cache
+*.pch
+*.ipch
+
+# その他一時ファイル
+*.log
+*.tmp
