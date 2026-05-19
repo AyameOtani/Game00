@@ -28,6 +28,12 @@ private:
 private:
 	float mfSpeed = 15.0f; // プレイヤーの移動速度
 
+	// --- 滑らか移動用の慣性・加速度パラメータ ---
+	VECTOR mvVelocity = VGet(0.0f, 0.0f, 0.0f); // 現在の水平速度（XZ）
+	float mfAccel = 40.0f;     // 加速係数（大きいほど速く目標速度に到達）
+	float mfDecel = 80.0f;    // 減速係数（ブレーキ）
+	float mfAirAccel = 2.0f;  // 空中での加速（小さめ）
+
 
 	float mfAngle;       // 現在の回転値
 	float mfTargetAngle; // 目標の回転値
@@ -36,6 +42,7 @@ private:
 	// ジャンプ関係
 	float mfJumpPower = 40.0f;
 	float mfGravity = -1.2f;
+
    // 落下の最大速度（正の値）。これを超えないようにする。
 	float mfMaxFallSpeed = 60.0f;
 	float mfYVelocity = 0.0f;

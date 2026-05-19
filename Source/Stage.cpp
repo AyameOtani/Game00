@@ -225,7 +225,7 @@ void Stage::TitleRotate()
 	}
 }
 
-// ⭐代替案：線分が当たったらtrueを返し、hitNormalに床の傾きを格納する
+// 線分が当たったらtrueを返し、hitNormalに床の傾きを格納する
 bool Stage::CheckHit_Line_Normal(VECTOR pos1, VECTOR pos2, VECTOR& hitNormal)
 {
 	// 一度普通にDxLibの線分判定を呼ぶ
