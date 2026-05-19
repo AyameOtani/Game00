@@ -27,15 +27,15 @@ Player3D::Player3D(VECTOR initPos, std::string filename)
 	m_wallSlideRadius = 23.0f;  // 壁スライド用の半径
 
 	// === 床判定用位置 (緑) ===
-	m_floorCapsuleMinY = 15.0f;   // 床判定カプセルの下端の高さ
+	m_floorCapsuleMinY = 3.0f;   // 床判定カプセルの下端の高さ
 	m_floorCapsuleMaxY = 25.0f;  // 床判定カプセルの上端の高さ
 	m_floorLinePos = 20.0f;  // 床判定用レイキャストのXZ広がり幅
 	m_floorLineMinY = 0.0f;  // 床判定用レイキャストの開始高さ
 	m_floorLineMaxY = -100.0f; // 床判定用レイキャストの終了高さ
 
 	// === 壁判定用位置 (赤) ===
-	m_wallCapsuleMinY = 26.0f;  // 壁判定カプセルの下端の高さ
-	m_wallCapsuleMaxY = 35.0f; // 壁判定カプセルの上端の高さ
+	m_wallCapsuleMinY = 35.0f;  // 壁判定カプセルの下端の高さ
+	m_wallCapsuleMaxY = 40.0f; // 壁判定カプセルの上端の高さ
 
 	// === 天井判定用位置 (青) ===
 	m_ceilCapsuleMinY = 36.0f; // 天井判定カプセルの下端の高さ
