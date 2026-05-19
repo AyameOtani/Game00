@@ -26,7 +26,7 @@ private:
 	Model* mpModel; // プレイヤーの3Dモデルを管理するポインタ
 
 private:
-	float mfSpeed = 8.0f; // プレイヤーの移動速度
+	float mfSpeed = 15.0f; // プレイヤーの移動速度
 
 
 	float mfAngle;       // 現在の回転値
@@ -34,8 +34,10 @@ private:
 	VECTOR mvOldPosition; // 古いポジション
 
 	// ジャンプ関係
-	float mfJumpPower = 25.0f;
+	float mfJumpPower = 40.0f;
 	float mfGravity = -1.2f;
+   // 落下の最大速度（正の値）。これを超えないようにする。
+	float mfMaxFallSpeed = 60.0f;
 	float mfYVelocity = 0.0f;
 	bool  mbIsGround = true;
 
@@ -52,7 +54,6 @@ private:
 	// -------------------------------------------------------------------------
 	// ★共通の半径
 	float m_radius;           // すべてのカプセルで共通の半径（50.0f）
-	float m_wallSlideRadius;  // 壁スライド時に使用する少し小さめの半径（45.0f）
 
 	// 床判定用位置 (緑)
 	float m_floorCapsuleMinY;
@@ -60,6 +61,8 @@ private:
 	float m_floorLinePos;
 	float m_floorLineMinY;
 	float m_floorLineMaxY;
+	// 床判定でラインのどちらを採用するか（true=最高点、false=最低点）
+	bool m_floorUseHighest = true;
 
 	// 壁判定用位置 (赤)
 	float m_wallCapsuleMinY;
@@ -71,5 +74,7 @@ private:
 	float m_ceilLinePos;
 	float m_ceilLineMinY;
 	float m_ceilLineMaxY;
+    // 天井判定でラインのどちらを採用するか（true=最低点、false=最高点）
+	bool m_ceilUseLowest = true;
 };
 

@@ -19,6 +19,9 @@ public:
 	// ステージとカプセル型の当たり判定
 	bool CheckHit_Capsule(VECTOR pos1, VECTOR pos2, float r);
 
+	// 代替案：構造体を使わず、参照渡しで法線（傾き）を受け取る関数
+	bool CheckHit_Line_Normal(VECTOR pos1, VECTOR pos2, VECTOR& hitNormal);
+
 	// ステージと線分との当たり判定
 	VECTOR CheckHit_Line(VECTOR pos1, VECTOR pos2);
 
