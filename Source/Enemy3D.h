@@ -22,6 +22,8 @@ public:
 	// 毎フレームの描画処理
 	void Draw() override;
 
+	void HitBullet(); // 弾とのあたり判定
+
 private:
 	Model* mpModel; // 敵の3Dモデルを管理するポインタ
 };

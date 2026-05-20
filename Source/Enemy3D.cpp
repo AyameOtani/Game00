@@ -1,5 +1,12 @@
 #include "Enemy3D.h"
 #include "Model.h"
+#include "Bullet3D.h"
+#include "Master.h"
+#include "SceneManager.h"
+#include "Scene.h"
+#include "ObjectManager.h"
+#include <cmath>
+
 
 // =========================================================================
 // コンストラクタ
@@ -39,6 +46,8 @@ void Enemy3D::Update()
 		mpModel->Update();
 	}
 
+	HitBullet();
+	
 	// 基底クラス（Object3D）のUpdateを呼び出す
 	Object3D::Update();
 }
@@ -54,6 +63,43 @@ void Enemy3D::Draw()
 		mpModel->Draw();
 	}
 
+	// -------------------------------------------------------------------------
+// 【追加】デバッグ用：敵のあたり判定の球体をワイヤーフレームで描画（緑色）
+// -------------------------------------------------------------------------
+	float bulletRadius = 40.0f;
+	DrawSphere3D(mvPosition, bulletRadius, 8, GetColor(0, 255, 0), GetColor(0, 255, 0), false);
+
+
 	// 基底クラス（Object3D）のDrawを呼び出す
 	Object3D::Draw();
+}
+
+
+// =========================================================================
+// 弾との当たり判定
+// =========================================================================
+void Enemy3D::HitBullet()
+{
+	auto bulletList = Master::mpSceneManager->GetCurrentScene()
+		->GetObjectManager()
+		->GetObject3DListByTag(Object3D::T_Bullet3D);
+
+	for (auto obj : bulletList)
+	{
+		// Bullet3Dとして扱う
+		Bullet3D* pBullet = dynamic_cast<Bullet3D*>(obj);
+		if (!pBullet) continue;
+
+		bool isHit = HitCheck_Sphere_Sphere(
+			mvPosition, 30.0f,                 // 敵の中心位置と半径（当たり判定）
+			pBullet->GetPosition(), 10.0f   // 弾の中心位置と半径（当たり判定）
+		);
+
+		if (isHit)
+		{
+			pBullet->SetDeleteFlag(true);
+			SetDeleteFlag(true);
+			break;
+		}
+	}
 }

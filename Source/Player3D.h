@@ -26,6 +26,8 @@ public:
 
 	void Shot(); // 発射処理
 
+	void DebugDraw(); // 描画デバッグ用
+
 private:
 	Model* mpModel; // プレイヤーの3Dモデルを管理するポインタ
 
@@ -34,8 +36,8 @@ private:
 
 	// 滑らか移動用の慣性  加速度
 	VECTOR mvVelocity = VGet(0.0f, 0.0f, 0.0f); // 現在の水平速度（XZ）
-	float mfAccel = 40.0f;     // 地上での加速係数
-	float mfDecel = 80.0f;     // 地上での減速係数（地上の急減速）
+	float mfAccel = 50.0f;     // 地上での加速係数
+	float mfDecel = 100.0f;     // 地上での減速係数（地上の急減速）
 	float mfAirAccel = 15.0f;  // 空中での加速（空中操作量を増やす）
 	float mfAirDecel = 10.0f;  // 空中での減速（地上より緩やかにする）
 

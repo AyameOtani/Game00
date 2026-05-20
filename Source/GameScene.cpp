@@ -26,10 +26,10 @@ void GameScene::Initialize()
 
 	// プレイヤーの生成
 	// Masterに渡したものをStatus* statusのやつに設定しているからこんな引数
-	Player3D* player = new Player3D(VGet(0, 0, 0), "Resource/3D/Player/octopus.mqo");
+	Player3D* player = new Player3D(VGet(0, 0, -5000), "Resource/3D/Player/octopus.mqo");
 
 	// 敵の生成
-	Enemy3D* enemy = new Enemy3D(VGet(200, 0, 200), "Resource/3D/Enemy/broccoli.mqo");
+	Enemy3D* enemy = new Enemy3D(VGet(0, 0, 0), "Resource/3D/Enemy/broccoli.mqo");
 
 	Stage* stage = new Stage ("Resource/3D/Stage1/stage.mqo", "Resource/3D/Stage1/stage.mqo");
 	stage->SetScale(2.3f); // 大きさ調整

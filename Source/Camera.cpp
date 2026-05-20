@@ -66,7 +66,7 @@ void Camera::Update()
 		// ★DX_PI_F は 3.14 と同じ意味
 		// 250.0f は注視点からどれだけ離れているかという意味
 		// 距離は変えないで回転したい
-		const float distance = 250.0f;
+		const float distance = 500.0f;
 		temp.x = distance * cosf(mfVerticalAngle / 180.0f * DX_PI_F) * sinf(mfHorizontalAngle / 180.0f * DX_PI_F);    // X座標
 		temp.y = distance * sinf(mfVerticalAngle / 180.0f * DX_PI_F);                                                 // Y座標
 		temp.z = -(distance * cosf(mfVerticalAngle / 180.0f * DX_PI_F) * cosf(mfHorizontalAngle / 180.0f * DX_PI_F)); // Z座標
