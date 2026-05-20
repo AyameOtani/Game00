@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Object3D.h"
+#include "Bullet3D.h"  // 【変更】Bullet3D クラスを使えるようにする
 #include <string>
 
 // プレイヤーを管理するクラス
@@ -7,6 +8,12 @@ class Player3D : public Object3D
 {
 private:
 	static constexpr float ROTATE_SPEED = 0.2f; // 回転速度
+
+	// -------------------------------------------------------------------------
+	// 【追加】弾の発射に関する定数
+	// -------------------------------------------------------------------------
+	// 弾を撃つ間隔（フレーム数）。10.0f なら 10フレームに1発 撃てる設定だよ
+	static constexpr float SHOT_INTERVAL = 10.0f;
 
 public:
 	// コンストラクタ（初期座標とモデルのファイル名を受け取る）
@@ -20,6 +27,11 @@ public:
 	void Jump();
 	void ResolveCollision3D(); // 当たり判定の関数
 
+	// -------------------------------------------------------------------------
+	// 【追加】弾の発射処理を行う関数
+	// -------------------------------------------------------------------------
+	void Shot();
+
 private:
 	Model* mpModel; // プレイヤーの3Dモデルを管理するポインタ
 
@@ -28,9 +40,10 @@ private:
 
 	// 滑らか移動用の慣性  加速度
 	VECTOR mvVelocity = VGet(0.0f, 0.0f, 0.0f); // 現在の水平速度（XZ）
-	float mfAccel = 40.0f;     // 加速係数
-	float mfDecel = 80.0f;     // 減速係数
-	float mfAirAccel = 5.0f;   // 空中での加速
+	float mfAccel = 40.0f;     // 地上での加速係数
+	float mfDecel = 80.0f;     // 地上での減速係数（地上の急減速）
+	float mfAirAccel = 15.0f;  // 空中での加速（空中操作量を増やす）
+	float mfAirDecel = 10.0f;  // 空中での減速（地上より緩やかにする）
 
 
 	float mfAngle;        // 現在の回転値
@@ -38,10 +51,10 @@ private:
 	VECTOR mvOldPosition; // 古いポジション
 
 	// ジャンプ関係
-	float mfJumpPower = 100.0f; // ジャンプ力
+	float mfJumpPower = 40.0f; // ジャンプ力
 	float mfGravity = -1.2f;    // 重力
 
-   // 落下の最大速度（正の値）。これを超えないようにする。
+	// 落下の最大速度（正の値）。これを超えないようにする。
 	float mfMaxFallSpeed = 60.0f;
 	float mfYVelocity = 0.0f;
 	bool  mbIsGround = true;
@@ -79,7 +92,11 @@ private:
 	float m_ceilLinePos;
 	float m_ceilLineMinY;
 	float m_ceilLineMaxY;
-    // 天井判定でラインのどちらを採用するか（true=最低点、false=最高点）
+	// 天井判定でラインのどちらを採用するか（true=最低点、false=最高点）
 	bool m_ceilUseLowest = true;
-};
 
+
+private:
+	// 連射を制限するためのタイマー用変数
+	float mfShotTimer = 0.0f;
+};
