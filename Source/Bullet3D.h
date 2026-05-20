@@ -36,7 +36,7 @@ private:
 	// åªç›ÇÃñ⁄ïWäpìx
 	float mfAngle = 0.0f;
 	float mfMoveSpeed = 0.0f; // ìÆÇ¢ÇΩó Ç≈è¡Ç∑ÇΩÇﬂ
-	float mfSpeed = 20.0f; // ë¨Ç≥
+	float mfSpeed = 40.0f; // ë¨Ç≥
 
 	Model* mpModel;
 };

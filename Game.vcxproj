@@ -22,6 +22,7 @@
     <ClCompile Include="Source\AttachmentModel.cpp" />
     <ClCompile Include="Source\Bullet3D.cpp" />
     <ClCompile Include="Source\Camera.cpp" />
+    <ClCompile Include="Source\Enemy3D.cpp" />
     <ClCompile Include="Source\GameScene.cpp" />
     <ClCompile Include="Source\InputManager.cpp" />
     <ClCompile Include="Source\Main.cpp" />
@@ -47,6 +48,7 @@
     <ClInclude Include="Source\Bullet3D.h" />
     <ClInclude Include="Source\Camera.h" />
     <ClInclude Include="Source\Collision.h" />
+    <ClInclude Include="Source\Enemy3D.h" />
     <ClInclude Include="Source\GameScene.h" />
     <ClInclude Include="Source\InputManager.h" />
     <ClInclude Include="Source\Master.h" />

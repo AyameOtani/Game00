@@ -22,7 +22,22 @@ Stage::Stage(std::string stageModelName, std::string stageCollisionModelName)
 	MV1SetupCollInfo(mnCollisionHandle, -1);
 }
 
+// スケール（拡大率）の設定（Modelクラスへの橋渡し）
+void Stage::SetScale(float scale)
+{
+	// モデルと当たり判定用コリジョンモデルの両方に反映させる
+	if (mnModelHandle != -1)
+	{
+		MV1SetScale(mnModelHandle, VGet(scale, scale, scale));
+	}
+	if (mnCollisionHandle != -1)
+	{
+		MV1SetScale(mnCollisionHandle, VGet(scale, scale, scale));
 
+		// 重要：モデルのサイズを変えたら、当たり判定情報も再構築しないとずれる！
+		MV1SetupCollInfo(mnCollisionHandle, -1);
+	}
+}
 
 //Stage::Stage(int modelhandel, int collisionHandle)
 //	: Object3D(VGet(0.0f, 0.0f, 0.0f)) // 座標は原点としておく
@@ -90,14 +105,14 @@ bool Stage::CheckHit_Capsule(VECTOR pos1, VECTOR pos2, float r)
 		// 回数を当たった回数を回す
 		for (int i = 0; i < result.HitNum; i++)
 		{
-			//// ３Dの三角形を描画する
-			//DrawTriangle3D(
-			//	result.Dim[i].Position[0],
-			//	result.Dim[i].Position[1],
-			//	result.Dim[i].Position[2],
-			//	GetColor(255, 0, 0),
-			//	0
-			//);
+			// ３Dの三角形を描画する
+			DrawTriangle3D(
+				result.Dim[i].Position[0],
+				result.Dim[i].Position[1],
+				result.Dim[i].Position[2],
+				GetColor(255, 0, 0),
+				0
+			);
 		}
 
 	}
@@ -155,27 +170,16 @@ bool Stage::CheckHit_Capsule_Wall(VECTOR pos1, VECTOR pos2, float r, VECTOR& hit
 	if (result.HitNum > 0) // ヒットした回数が０以上だったら（当たっていたら）
 	{
         int nearIndex = 0; // いちばん近いヒット数を入れる変数
-		float nearDistance = 999999.0f; // 最小距離の保持の為の変数
+		float nearDistance = FLT_MAX; // 最小距離の保持の為の変数
 
-        // 当たった三角形の数だけ調べる
+		// Stage.cpp の CheckHit_Capsule_Wall の forループ内
 		for (int i = 0; i < result.HitNum; i++)
 		{
-			// MV1CollCheck_Capsule の結果には各ポリゴンに対する HitPosition が含まれるはず
-			// そこを基準に最も近いポリゴンを選ぶ
-			VECTOR hitPosPoly = result.Dim[i].HitPosition;
-			float distance = VSize(VSub(hitPosPoly, pos1));
-			if (distance < nearDistance)
-			{
-				nearDistance = distance;
-				nearIndex = i;
-			}
-
-			// デバッグ用の三角形の描画
 			DrawTriangle3D(
 				result.Dim[i].Position[0],
 				result.Dim[i].Position[1],
 				result.Dim[i].Position[2],
-				GetColor(0, 255, 0), // 緑
+				GetColor(255, 0, 0), // 赤色に変えて目立たせてみる
 				false
 			);
 		}
@@ -215,7 +219,7 @@ void Stage::TitleRotate()
 			mfRotation -= DX_TWO_PI_F; // 今の回転角から３６０分引く
 		}
 		mvRotation.y = mfRotation;
-		//MV1SetRotationXYZ(mnModelHandle, mvRotation);
+		//MV1SetRotationXYZ(mnModelHandle, mvRotation);v
 
 
 		// ------フォグ設定 ------

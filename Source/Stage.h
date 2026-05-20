@@ -36,6 +36,9 @@ public:
 	bool GetRotate() const { return mbRota; }
 	void SetRotate(bool rt) { mbRota = rt; }
 
+	// スケール（拡大率）の設定
+	void SetScale(float scale);
+
 private:
 	int mnModelHandle;     // ステージモデルのハンドル
 	int mnCollisionHandle; // ステージのコリジョンモデルのハンドル

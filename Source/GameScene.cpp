@@ -6,6 +6,7 @@
 #include "SkyBox.h"
 #include "Player3D.h"
 #include "Stage.h"
+#include "Enemy3D.h"
 
 GameScene::GameScene()
 	: Scene()     // 基底クラスのコンストラクタを呼び出しておく
@@ -27,7 +28,12 @@ void GameScene::Initialize()
 	// Masterに渡したものをStatus* statusのやつに設定しているからこんな引数
 	Player3D* player = new Player3D(VGet(0, 0, 0), "Resource/3D/Player/octopus.mqo");
 
+	// 敵の生成
+	Enemy3D* enemy = new Enemy3D(VGet(200, 0, 200), "Resource/3D/Enemy/broccoli.mqo");
+
 	Stage* stage = new Stage ("Resource/3D/Stage1/stage.mqo", "Resource/3D/Stage1/stage.mqo");
+	stage->SetScale(2.3f); // 大きさ調整
+
 	// ここでカメラを元の位置に戻している
 	Master::mpCamera->Reset();
 }

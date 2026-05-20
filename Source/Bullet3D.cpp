@@ -1,33 +1,30 @@
 #include "Bullet3D.h"
 #include "Model.h"
+#include "Master.h"
+#include "SceneManager.h"
+#include "Scene.h"
+#include "ObjectManager.h"
+#include "Stage.h" // 【追加】Stageクラスを使うためにインクルード
 
 // =========================================================================
-// コンストラクタ（位置、モデル名、向きを受け取る）
+// コンストラクタ（既存のまま）
 // =========================================================================
 Bullet3D::Bullet3D(VECTOR initPos, std::string filename, VECTOR Direction)
-	: Object3D(initPos)      // 基底クラス Object3D に初期位置を渡す
-	, mvDirection(Direction)  // 飛んでいく向きを保存
-	, mfSpeed(20.0f)          // 弾の速さを設定（ヘッダー初期値と同じ）
-	, mfMoveSpeed(0.0f)       // 動いた距離をリセット
+	: Object3D(initPos)
+	, mvDirection(Direction)
+	, mfSpeed(20.0f)
+	, mfMoveSpeed(0.0f)
 {
-	// 向きベクトルを念のため正規化（綺麗な長さ1の方向にする）
 	mvDirection = VNorm(mvDirection);
-
 	SetTag(Object3D::T_Bullet3D);
-
-	// 弾の3Dモデルを生成して初期位置に配置
 	mpModel = new Model(filename, initPos);
-
-	// ※もし弾の進む向きに合わせてモデルを回転させたい場合は、
-	// ここで atan2f 等を使って角度を計算してモデルにセットしてね。
 }
 
 // =========================================================================
-// デストラクタ
+// デストラクタ（既存のまま）
 // =========================================================================
 Bullet3D::~Bullet3D()
 {
-	// 生成した3Dモデルを安全に削除
 	if (mpModel != nullptr)
 	{
 		delete mpModel;
@@ -40,76 +37,96 @@ Bullet3D::~Bullet3D()
 // =========================================================================
 void Bullet3D::Update()
 {
-	// 移動処理を呼び出す
 	Move();
 
-	// あたり判定の関数をここで呼び出す（中身ができたらコメントアウトを外してね）
-	// HitStage();
+	// 【修正】ステージとのあたり判定の呼び出しを有効化！
+	HitStage();
+
 	// HitEnemy();
 	// HitPlayer();
 
-	// 基底クラス（Object3D）のUpdateを呼び出す
 	Object3D::Update();
 }
 
 // =========================================================================
-// 移動処理
+// 移動処理（既存のまま）
 // =========================================================================
 void Bullet3D::Move()
 {
-	// 1フレームの移動量を計算（向き × 速さ）
 	VECTOR velocity = VScale(mvDirection, mfSpeed);
-
-	// 現在の座標（mvPosition）に足し算して進める
 	mvPosition = VAdd(mvPosition, velocity);
-
-	// 動いた距離を蓄積していく（毎フレーム、スピード分だけ増える）
 	mfMoveSpeed += mfSpeed;
 
-	// モデルの位置も新しい座標に同期させて更新
 	if (mpModel != nullptr)
 	{
 		mpModel->SetPosition(mvPosition);
 		mpModel->Update();
 	}
 
-	// -------------------------------------------------------------------------
-	// 【追加】移動距離が 1000 を超えたら、自動管理システムに削除を依頼する
-	// -------------------------------------------------------------------------
 	if (mfMoveSpeed > 1500.0f)
 	{
-		SetDeleteFlag(true); // 基底クラス（Object3D）の削除フラグを true にする！
+		SetDeleteFlag(true);
 	}
 }
+
 // =========================================================================
 // 描画処理
 // =========================================================================
 void Bullet3D::Draw()
 {
-	// 3Dモデルを描画
+	// -------------------------------------------------------------------------
+	// 【追加】デバッグ用：弾のあたり判定の球体をワイヤーフレームで描画（緑色）
+	// -------------------------------------------------------------------------
+	float bulletRadius = 10.0f; // 弾のあたり判定の半径（好みのサイズに調整してね）
+	DrawSphere3D(mvPosition, bulletRadius, 8, GetColor(0, 255, 0), GetColor(0, 255, 0), false);
+
 	if (mpModel != nullptr)
 	{
 		mpModel->Draw();
 	}
 
-	// 基底クラス（Object3D）のDrawを呼び出す
 	Object3D::Draw();
 }
 
 // =========================================================================
-// 各種あたり判定（構造の土台だけ用意しているよ）
+// 【修正】ステージとのあたり判定
 // =========================================================================
 void Bullet3D::HitStage()
 {
-	// 壁や床とのあたり判定をここに書く
+	// 弾の判定用半径（Drawのデバッグ球とサイズを合わせてね）
+	float bulletRadius = 10.0f;
+
+	// ゲーム内のステージオブジェクトのリストを取得する
+	auto stageList = Master::mpSceneManager->GetCurrentScene()
+		->GetObjectManager()->GetObject3DListByTag(Object3D::T_Stage3D);
+
+	// ステージのリストを一つずつループして、弾と当たっているか調べる
+	for (auto obj : stageList)
+	{
+		Stage* pStage = dynamic_cast<Stage*>(obj);
+		if (!pStage) continue;
+
+		// 衝突点と法線を受け取るための変数（関数に渡すために必要）
+		VECTOR hitPos = VGet(0.0f, 0.0f, 0.0f);
+		VECTOR hitNormal = VGet(0.0f, 0.0f, 0.0f);
+
+		// -------------------------------------------------------------------------
+		// 【ポイント】始点と終点にどちらも「mvPosition」を渡す！
+		// これでカプセル判定が、半径 bulletRadius の「球体判定」として動きます！
+		// -------------------------------------------------------------------------
+		if (pStage->CheckHit_Capsule_Wall(mvPosition, mvPosition, bulletRadius, hitPos, hitNormal))
+		{
+			// ステージに当たったら、削除フラグを true にして弾を消去！
+			SetDeleteFlag(true);
+			break; // ループを抜ける
+		}
+	}
 }
 
 void Bullet3D::HitEnemy()
 {
-	// 敵とのあたり判定をここに書く
 }
 
 void Bullet3D::HitPlayer()
 {
-	// プレイヤーとのあたり判定をここに書く
 }
