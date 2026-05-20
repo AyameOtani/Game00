@@ -15,33 +15,31 @@ public:
 
 	void Update() override;
 	void Draw() override;
-	void MoveEx(); // 移動処理（ステージとのあたり判定用）
+	void MoveEx(); // 移動処理
 	void RotationByMove(); // 回転処理の関数
-
 	void Jump();
-
-
 	void ResolveCollision3D(); // 当たり判定の関数
+
 private:
 	Model* mpModel; // プレイヤーの3Dモデルを管理するポインタ
 
 private:
 	float mfSpeed = 15.0f; // プレイヤーの移動速度
 
-	// --- 滑らか移動用の慣性・加速度パラメータ ---
+	// 滑らか移動用の慣性  加速度
 	VECTOR mvVelocity = VGet(0.0f, 0.0f, 0.0f); // 現在の水平速度（XZ）
-	float mfAccel = 40.0f;     // 加速係数（大きいほど速く目標速度に到達）
-	float mfDecel = 80.0f;    // 減速係数（ブレーキ）
-	float mfAirAccel = 2.0f;  // 空中での加速（小さめ）
+	float mfAccel = 40.0f;     // 加速係数
+	float mfDecel = 80.0f;     // 減速係数
+	float mfAirAccel = 5.0f;   // 空中での加速
 
 
-	float mfAngle;       // 現在の回転値
-	float mfTargetAngle; // 目標の回転値
+	float mfAngle;        // 現在の回転値
+	float mfTargetAngle;  // 目標の回転値
 	VECTOR mvOldPosition; // 古いポジション
 
 	// ジャンプ関係
-	float mfJumpPower = 40.0f;
-	float mfGravity = -1.2f;
+	float mfJumpPower = 100.0f; // ジャンプ力
+	float mfGravity = -1.2f;    // 重力
 
    // 落下の最大速度（正の値）。これを超えないようにする。
 	float mfMaxFallSpeed = 60.0f;

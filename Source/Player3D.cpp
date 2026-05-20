@@ -13,6 +13,9 @@
 // コンストラクタ
 Player3D::Player3D(VECTOR initPos, std::string filename)
 	: Object3D(initPos)
+	, mfAngle(0.0f)
+	, mfTargetAngle(0.0f)
+	, mvOldPosition(initPos)
 {
 	// Object3D が持っている mpModel にモデルを生成して入れる
 	mpModel = new Model(filename, initPos);
@@ -21,10 +24,7 @@ Player3D::Player3D(VECTOR initPos, std::string filename)
 	SetTag(Tag3D::T_Player3D);
 
 
-	// -------------------------------------------------------------------------
 	// 当たり判定パラメータの初期化
-	// -------------------------------------------------------------------------
-	// ★半径の統一管理
 	m_radius = 30.0f;  // 全カプセル共通の半径
 
 	// === 床判定用位置 (緑) ===
@@ -95,43 +95,39 @@ void Player3D::Update()
 // 描画処理
 void Player3D::Draw()
 {
-	// -------------------------------------------------------------------------
-	// デバッグ用：各当たり判定カプセルの可視化 (ワイヤーフレーム描画)
-	// -------------------------------------------------------------------------
-
-	// 1. 【床用】カプセル（緑 / Green）
+	// デバッグ用：各当たり判定カプセルの可視化
+	// 床用 カプセル（緑）
 	DrawCapsule3D(
 		VAdd(mvPosition, VGet(0.0f, m_floorCapsuleMinY, 0.0f)),
 		VAdd(mvPosition, VGet(0.0f, m_floorCapsuleMaxY, 0.0f)),
-		m_radius, 8, // ★統一メンバを使用
+		m_radius, 8,
 		GetColor(0, 255, 0), GetColor(0, 255, 0), false
 	);
 
-	// 2. 【壁用】カプセル（赤 / Red）
+	// 壁用 カプセル（赤）
 	DrawCapsule3D(
 		VAdd(mvPosition, VGet(0.0f, m_wallCapsuleMinY, 0.0f)),
 		VAdd(mvPosition, VGet(0.0f, m_wallCapsuleMaxY, 0.0f)),
-		m_radius, 8, // ★統一メンバを使用
+		m_radius, 8,
 		GetColor(255, 0, 0), GetColor(255, 0, 0), false
 	);
 
-	// 3. 【天井用】カプセル（青 / Blue）
+	// 天井用  カプセル（青）
 	DrawCapsule3D(
 		VAdd(mvPosition, VGet(0.0f, m_ceilCapsuleMinY, 0.0f)),
 		VAdd(mvPosition, VGet(0.0f, m_ceilCapsuleMaxY, 0.0f)),
-		m_radius, 8, // ★統一メンバを使用
+		m_radius, 8,
 		GetColor(0, 0, 255), GetColor(0, 0, 255), false
 	);
 
-	// -------------------------------------------------------------------------
 
-	// デバッグ表示用  白いやつ
-	DrawCapsule3D(
-		VAdd(mvPosition, VGet(0.0f, 20.0f, 0.0f)),
-		VAdd(mvPosition, VGet(0.0f, 40.0f, 0.0f)),
-		23.0f, 8,
-		GetColor(255, 255, 255), GetColor(255, 255, 255), false
-	);
+	//// デバッグ表示用  白いやつ
+	//DrawCapsule3D(
+	//	VAdd(mvPosition, VGet(0.0f, 20.0f, 0.0f)),
+	//	VAdd(mvPosition, VGet(0.0f, 40.0f, 0.0f)),
+	//	m_radius, 8,
+	//	GetColor(255, 255, 255), GetColor(255, 255, 255), false
+	//);
 
 
 	mpModel->Draw();
@@ -139,10 +135,10 @@ void Player3D::Draw()
 	Object3D::Draw();
 }
 
-// 移動処理（ステージとのあたり判定用）
+// 移動処理
 void Player3D::MoveEx()
 {
-	// 移動方向をきめる -> 速度をかける
+	// 移動方向をきめて速度をかける
 	VECTOR moveVec = VGet(0.0f, 0.0f, 0.0f); // 移動方向
 	VECTOR upMoveVector = VGet(0.0f, 0.0f, 0.0f); // カメラの上方向（奥方向）ベクトル
 	VECTOR leftMoveVector = VGet(0.0f, 0.0f, 0.0f); // カメラの左方向ベクトル
@@ -155,7 +151,7 @@ void Player3D::MoveEx()
 		upMoveVector.y = 0.0f;
 
 		// 左方向への移動ベクトルは、上方向への移動ベクトルと、ｙ軸のプラス方向へのベクトルに垂直な方向 (外積)
-		// VCross: ベクトル同士の外積を計算してくれるもの ★★★
+		// VCross: ベクトル同士の外積を計算してくれるもの
 		leftMoveVector = VCross(upMoveVector, VGet(0.0f, 1.0f, 0.0f));
 		leftMoveVector.y = 0.0f;
 
@@ -171,8 +167,6 @@ void Player3D::MoveEx()
 	}
 	if (CheckHitKey(KEY_INPUT_D)) // 右方向
 	{
-		// moveVec = VSub(moveVec, leftMoveVector);
-		// VScaleはVECTORに対して指定した数をかけてあげるもの
 		moveVec = VAdd(moveVec, VScale(leftMoveVector, -1.0f));
 	}
 	if (CheckHitKey(KEY_INPUT_W)) // 奥方向
@@ -181,18 +175,9 @@ void Player3D::MoveEx()
 	}
 	if (CheckHitKey(KEY_INPUT_S)) // 手前方向
 	{
-		// moveVec = VSub(moveVec, upMoveVector);
-		// VScaleはVECTORに対して指定した数をかけてあげるもの
 		moveVec = VAdd(moveVec, VScale(upMoveVector, -1.0f));
 	}
 
-	// 上限突破したら、初期位置に戻す　11/11追加
-	if (mvPosition.y >= 4500)
-	{
-		mvPosition.x = 0;
-		mvPosition.y = 0;
-		mvPosition.z = 0;
-	}
 
 	// -------------------- ゲームパッドのスティック入力 -------------------- ★★        
 	int StickX, StickY; // XとYを入れる変数
@@ -226,7 +211,6 @@ void Player3D::MoveEx()
 	// -------------------- moveVec と moveVec2 の統合 --------------------
 	moveVec = VAdd(moveVec, moveVecPad);
 
-    // target velocity based on input
 	VECTOR targetDir = VGet(0,0,0);
 	float inputMag = VSize(moveVec);
 	if (inputMag > 0.0001f)
@@ -235,7 +219,7 @@ void Player3D::MoveEx()
 		mfTargetAngle = atan2f(targetDir.x, targetDir.z);
 	}
 
-	// use fixed deltaTime for now (assume ~60fps)
+	// デルタタイム
 	const float dt = 1.0f / 60.0f;
 
 	// target horizontal velocity

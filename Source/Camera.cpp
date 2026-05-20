@@ -4,7 +4,6 @@
 #include "InputManager.h"
 #include "SceneManager.h"
 #include "Scene.h"
-
 #include <cmath> // cosなどを使うためのインクルード
 
 Camera::Camera()
@@ -64,7 +63,7 @@ void Camera::Update()
 		VECTOR temp;   // 作業用変数
 
 		// 球面上の座標を求める
-		//   ★DX_PI_F は 3.14 と同じ意味
+		// ★DX_PI_F は 3.14 と同じ意味
 		// 250.0f は注視点からどれだけ離れているかという意味
 		// 距離は変えないで回転したい
 		const float distance = 250.0f;
