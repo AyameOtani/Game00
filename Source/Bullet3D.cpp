@@ -4,7 +4,8 @@
 #include "SceneManager.h"
 #include "Scene.h"
 #include "ObjectManager.h"
-#include "Stage.h" // 【追加】Stageクラスを使うためにインクルード
+#include "Stage.h"
+#include "Enemy3D.h"
 
 // =========================================================================
 // コンストラクタ（既存のまま）
@@ -42,7 +43,7 @@ void Bullet3D::Update()
 	// 【修正】ステージとのあたり判定の呼び出しを有効化！
 	HitStage();
 
-	// HitEnemy();
+	 HitEnemy();
 	// HitPlayer();
 
 	Object3D::Update();
@@ -63,6 +64,7 @@ void Bullet3D::Move()
 		mpModel->Update();
 	}
 
+	// 動いた量で消す
 	if (mfMoveSpeed > 1500.0f)
 	{
 		SetDeleteFlag(true);
@@ -77,8 +79,7 @@ void Bullet3D::Draw()
 	// -------------------------------------------------------------------------
 	// 【追加】デバッグ用：弾のあたり判定の球体をワイヤーフレームで描画（緑色）
 	// -------------------------------------------------------------------------
-	float bulletRadius = 10.0f; // 弾のあたり判定の半径（好みのサイズに調整してね）
-	DrawSphere3D(mvPosition, bulletRadius, 8, GetColor(0, 255, 0), GetColor(0, 255, 0), false);
+	DrawSphere3D(mvPosition, GetRadius(), 8, GetColor(0, 255, 0), GetColor(0, 255, 0), false);
 
 	if (mpModel != nullptr)
 	{
@@ -89,12 +90,12 @@ void Bullet3D::Draw()
 }
 
 // =========================================================================
-// 【修正】ステージとのあたり判定
+// ステージとのあたり判定
 // =========================================================================
 void Bullet3D::HitStage()
 {
-	// 弾の判定用半径（Drawのデバッグ球とサイズを合わせてね）
-	float bulletRadius = 10.0f;
+	// 弾の判定用半径
+	float bulletRadius = GetRadius();
 
 	// ゲーム内のステージオブジェクトのリストを取得する
 	auto stageList = Master::mpSceneManager->GetCurrentScene()
@@ -123,10 +124,40 @@ void Bullet3D::HitStage()
 	}
 }
 
+// =========================================================================
+// 敵とのあたり判定
+// =========================================================================
 void Bullet3D::HitEnemy()
 {
-}
+	// 敵一覧取得
+	auto enemyList = Master::mpSceneManager->GetCurrentScene()
+		->GetObjectManager()
+		->GetObject3DListByTag(Object3D::T_Enemy3D);
 
+	// 敵を順番に調べる
+	for (auto obj : enemyList)
+	{
+		Enemy3D* pEnemy = dynamic_cast<Enemy3D*>(obj);
+		if (!pEnemy) continue;
+
+		// 球同士の判定
+		bool isHit = HitCheck_Sphere_Sphere(
+			mvPosition, GetRadius(),              // 弾
+			pEnemy->GetPosition(), pEnemy->GetRadius()   // 敵
+		);
+
+		if (isHit)
+		{
+			// 弾消す
+			SetDeleteFlag(true);
+
+			// 敵消す
+			pEnemy->SetDeleteFlag(true);
+
+			break;
+		}
+	}
+}
 void Bullet3D::HitPlayer()
 {
 }

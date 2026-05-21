@@ -34,14 +34,14 @@ void SkyBox::Update()
 	}
 
 
-	// ‰ñ“]‚·‚é‚æ‚¤‚É‚µ‚½@1210
-	mfRotation += 0.0003f; // ‚±‚±‚Å‰ñ“]‘¬“x
-	if (mfRotation > DX_TWO_PI_F) // 360‚ð‰z‚µ‚½‚ç
-	{
-		mfRotation -= DX_TWO_PI_F; // ¡‚Ì‰ñ“]Šp‚©‚ç‚R‚U‚O•ªˆø‚­
-	}
-	mvRotation.y = mfRotation;
-	mpModel->SetRotation(mvRotation); // model‚É‰ñ“]‘¬“x‚ðƒZƒbƒg
+	//// ‰ñ“]‚·‚é‚æ‚¤‚É‚µ‚½@1210
+	//mfRotation += 0.0003f; // ‚±‚±‚Å‰ñ“]‘¬“x
+	//if (mfRotation > DX_TWO_PI_F) // 360‚ð‰z‚µ‚½‚ç
+	//{
+	//	mfRotation -= DX_TWO_PI_F; // ¡‚Ì‰ñ“]Šp‚©‚ç‚R‚U‚O•ªˆø‚­
+	//}
+	//mvRotation.y = mfRotation;
+	//mpModel->SetRotation(mvRotation); // model‚É‰ñ“]‘¬“x‚ðƒZƒbƒg
 
 
 	// ƒvƒŒƒCƒ„[‚Ìî•ñŽæ“¾
@@ -53,7 +53,7 @@ void SkyBox::Update()
 		// ‚Å‚©‚­‚µ‚·‚¬‚½‚çƒJƒƒ‰‚ªƒoƒO‚é‚Ì‚ÅA’ÇÕ‚·‚é‚æ‚¤‚É‚µ‚½B
 		//@’ÇÕ‚³‚¹‚½‚ç‚¨‚¨‚«‚­‚Ä“G‚ª‰B‚ê‚é‚©‚ç‚â‚ß‚½‚Ù‚¤‚ª—Ç‚¢‚©‚àH
 		VECTOR playerPos = pPlayer->GetPosition();
-		//mpModel->SetPosition(VGet(playerPos.x, 0.0f, playerPos.z));
+		mpModel->SetPosition(VGet(playerPos.x, 0.0f, playerPos.z));
 	}
 }
 

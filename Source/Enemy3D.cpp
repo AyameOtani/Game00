@@ -11,14 +11,40 @@
 // =========================================================================
 // コンストラクタ
 // =========================================================================
-Enemy3D::Enemy3D(VECTOR initPos, std::string filename)
-	: Object3D(initPos) // 基底クラス Object3D に初期座標を渡す
+Enemy3D::Enemy3D(VECTOR initPos, std::string filename, EnemyType type)
+	: Object3D(initPos), m_type(type) // 敵タイプを初期化
+	, mfAngle(0.0f)
+	, mfTargetAngle(0.0f)
+	, mvOldPosition(initPos)
 {
 	// 自身の mnTag に敵のタグ（T_Enemy3D）をセットして識別できるようにする
 	SetTag(Object3D::T_Enemy3D);
-
 	// 敵用の3Dモデルを生成して初期位置に配置
 	mpModel = new Model(filename, initPos);
+
+
+
+	m_radius = 30.0f; // プレイヤーの当たり判定半径
+
+	// 床判定用の各高さ設定
+	m_floorCapsuleMinY = 3.0f;
+	m_floorCapsuleMaxY = 40.0f;
+	m_floorLinePos = 25.0f;
+	m_floorLineMinY = 20.0f;
+	m_floorLineMaxY = -300.0f;
+
+	// 壁判定用の各高さ設定
+	m_wallCapsuleMinY = 40.0f;
+	m_wallCapsuleMaxY = 60.0f;
+
+	// 天井判定用の各高さ設定
+	m_ceilCapsuleMinY = 60.0f;
+	m_ceilCapsuleMaxY = 80.0f;
+	m_ceilLinePos = 15.0f;
+	m_ceilLineMinY = 70.0f;
+	m_ceilLineMaxY = 100.0f;
+
+	SetFontSize(20);
 }
 
 // =========================================================================
@@ -46,7 +72,6 @@ void Enemy3D::Update()
 		mpModel->Update();
 	}
 
-	HitBullet();
 	
 	// 基底クラス（Object3D）のUpdateを呼び出す
 	Object3D::Update();
@@ -63,43 +88,11 @@ void Enemy3D::Draw()
 		mpModel->Draw();
 	}
 
-	// -------------------------------------------------------------------------
-// 【追加】デバッグ用：敵のあたり判定の球体をワイヤーフレームで描画（緑色）
-// -------------------------------------------------------------------------
+	// デバッグ用：敵のあたり判定の球体をワイヤーフレームで描画（緑色）
 	float bulletRadius = 40.0f;
 	DrawSphere3D(mvPosition, bulletRadius, 8, GetColor(0, 255, 0), GetColor(0, 255, 0), false);
 
 
 	// 基底クラス（Object3D）のDrawを呼び出す
 	Object3D::Draw();
-}
-
-
-// =========================================================================
-// 弾との当たり判定
-// =========================================================================
-void Enemy3D::HitBullet()
-{
-	auto bulletList = Master::mpSceneManager->GetCurrentScene()
-		->GetObjectManager()
-		->GetObject3DListByTag(Object3D::T_Bullet3D);
-
-	for (auto obj : bulletList)
-	{
-		// Bullet3Dとして扱う
-		Bullet3D* pBullet = dynamic_cast<Bullet3D*>(obj);
-		if (!pBullet) continue;
-
-		bool isHit = HitCheck_Sphere_Sphere(
-			mvPosition, 30.0f,                 // 敵の中心位置と半径（当たり判定）
-			pBullet->GetPosition(), 10.0f   // 弾の中心位置と半径（当たり判定）
-		);
-
-		if (isHit)
-		{
-			pBullet->SetDeleteFlag(true);
-			SetDeleteFlag(true);
-			break;
-		}
-	}
 }

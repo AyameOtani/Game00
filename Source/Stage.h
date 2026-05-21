@@ -45,4 +45,6 @@ private:
 	float mfRotation; // タイトルで回転したい
 	bool mbRota; // 回転をするかのフラグ
 
+	float mfMoveTime;
+
 };

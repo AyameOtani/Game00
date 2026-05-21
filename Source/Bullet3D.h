@@ -29,6 +29,8 @@ public:
 	void HitEnemy(); // 敵とのあたり判定
 	void HitPlayer();// プレイヤーとのあたり判定
 
+	float GetRadius() const { return m_radius; } // 当たり判定の半径を返すゲッター
+
 
 private:
 
@@ -37,6 +39,8 @@ private:
 	float mfAngle = 0.0f;
 	float mfMoveSpeed = 0.0f; // 動いた量で消すため
 	float mfSpeed = 40.0f; // 速さ
+
+	float m_radius = 10.0f; // 当たり判定の半径
 
 	Model* mpModel;
 };

@@ -8,6 +8,9 @@
 #include "Stage.h"
 #include "ObjectManager.h"
 #include <algorithm>
+#include "Enemy3D.h"
+
+
 
 // コンストラクタ：プレイヤーの初期化
 Player3D::Player3D(VECTOR initPos, std::string filename)
@@ -83,7 +86,7 @@ void Player3D::Update()
 	// リセット処理（デバッグ用：キー1で原点に戻る）
 	if (CheckHitKey(KEY_INPUT_1))
 	{
-		mvPosition = VGet(0.0f, 0.0f, -5000.0f);
+		mvPosition = VGet(0.0f, 0.0f, 0.0f);
 		mfYVelocity = 0.0f;
 		mbIsGround = false;
 	}

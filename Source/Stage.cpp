@@ -6,7 +6,7 @@ Stage::Stage(std::string stageModelName, std::string stageCollisionModelName)
 	: Object3D(VGet(0.0f, 0.0f, 0.0f)) // 座標は原点としておく
 	, mnModelHandle(-1)
 	, mnCollisionHandle(-1)
-
+	, mfMoveTime(0.0f)
 {
 	// タグ設定
 	SetTag(Object3D::T_Stage3D);
@@ -66,13 +66,28 @@ Stage::~Stage()
 
 void Stage::Update()
 {
+
 	TitleRotate();
 
+	// 時間加算
+	mfMoveTime += 0.016f;
+
+	// 上下移動
+	//mvPosition.y = sinf(mfMoveTime) * 100.0f;
+
+
+	// モデル位置
 	MV1SetPosition(mnModelHandle, mvPosition);
+	// コリジョン位置
 	MV1SetPosition(mnCollisionHandle, mvPosition);
 
+	// 回転
 	MV1SetRotationXYZ(mnModelHandle, mvRotation);
 	MV1SetRotationXYZ(mnCollisionHandle, mvRotation);
+
+	// ★重要
+	// コリジョン情報更新
+	MV1RefreshCollInfo(mnCollisionHandle);
 
 }
 
