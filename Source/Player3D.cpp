@@ -29,7 +29,7 @@ Player3D::Player3D(VECTOR initPos, std::string filename)
 	// 床判定用：足元から少し上の範囲をカプセルでチェック
 	m_floorCapsuleMinY = 3.0f;  // 床判定カプセルの下端
 	m_floorCapsuleMaxY = 40.0f; // 床判定カプセルの上端
-	m_floorLinePos = 25.0f;     // 床との接地を測るラインの横位置オフセット
+	m_floorLinePos = 30.0f;     // 床との接地を測るラインの横位置オフセット
 	m_floorLineMinY = 20.0f;    // 判定ラインの開始高さ
 	m_floorLineMaxY = -300.0f;  // 判定ラインの終了高さ（これだけ地面方向に長い）
 
@@ -40,7 +40,7 @@ Player3D::Player3D(VECTOR initPos, std::string filename)
 	// 天井判定用：キャラの頭上付近で天井をチェック
 	m_ceilCapsuleMinY = 50.0f;  // 天井判定カプセルの下端
 	m_ceilCapsuleMaxY = 60.0f;  // 天井判定カプセルの上端
-	m_ceilLinePos = 15.0f;      // 天井との衝突を測るラインの横位置オフセット
+	m_ceilLinePos = 35.0f;      // 天井との衝突を測るラインの横位置オフセット
 	m_ceilLineMinY = 70.0f;     // 判定ラインの開始高さ
 	m_ceilLineMaxY = 100.0f;    // 判定ラインの終了高さ（キャラの頭上までチェック）
 
