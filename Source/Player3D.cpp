@@ -40,7 +40,7 @@ Player3D::Player3D(VECTOR initPos, std::string filename)
 	// 天井判定用：キャラの頭上付近で天井をチェック
 	m_ceilCapsuleMinY = 50.0f;  // 天井判定カプセルの下端
 	m_ceilCapsuleMaxY = 60.0f;  // 天井判定カプセルの上端
-	m_ceilLinePos = 35.0f;      // 天井との衝突を測るラインの横位置オフセット
+	m_ceilLinePos = 30.0f;      // 天井との衝突を測るラインの横位置オフセット
 	m_ceilLineMinY = 70.0f;     // 判定ラインの開始高さ
 	m_ceilLineMaxY = 100.0f;    // 判定ラインの終了高さ（キャラの頭上までチェック）
 
@@ -264,53 +264,51 @@ void Player3D::Jump()
 // 3D環境との当たり判定を解決して、衝突応答を行う関数
 void Player3D::ResolveCollision3D()
 {
-	// 1. 移動ベクトル（今フレームの移動量）を算出する
+	// 1. ステージオブジェクトリストの取得
+	// リストのコピーを避け、const参照で保持することでメモリと計算負荷を軽減します
+	const auto& stageList = Master::mpSceneManager->GetCurrentScene()->GetObjectManager()->GetObject3DListByTag(Object3D::T_Stage3D);
+
+	// 2. 移動ベクトルを算出し、判定用に位置を巻き戻す
 	VECTOR moveVec = VSub(mvPosition, mvOldPosition);
-	// 2. 判定用に一旦プレイヤー位置を移動前に戻す
 	mvPosition = mvOldPosition;
 
+	// 衝突判定用フラグと、衝突した面の情報を記録する変数群
 	bool isHitCeiling = false;
 	float ceilMinY = FLT_MAX;
 	float ceilMaxY = -FLT_MAX;
-	float bestFloorY = -FLT_MAX;
+	float bestFloorY = -FLT_MAX; // 最も高い位置にある床（足場）を探すための初期値
 	bool isHitFloor = false;
 
-	// 3. シーン上の全ステージオブジェクトのリストを取得する
-	auto stageList = Master::mpSceneManager->GetCurrentScene()->GetObjectManager()->GetObject3DListByTag(Object3D::T_Stage3D);
+	// 3. 壁判定用の定数オフセット
+	// 判定用5地点（中心と前後左右）のオフセットを静的配列として定義し、ループ内生成を排除
+	const float step = m_floorLinePos;
+	const VECTOR kOffsets[5] = {
+		{0, 0, 0}, {step, 0, 0}, {-step, 0, 0}, {0, 0, step}, {0, 0, -step}
+	};
 
-	// 4. 壁判定用のラムダ式（指定位置が壁に埋まっているか確認）
-	auto CollidesAt = [&](VECTOR pos) -> bool
-		{
-			for (auto obj : stageList)
-			{
-				Stage* wall = dynamic_cast<Stage*>(obj);
-				if (!wall) continue;
-
-				VECTOR hp, hn;
-				if (wall->CheckHit_Capsule_Wall(VAdd(pos, VGet(0, m_wallCapsuleMinY, 0)), VAdd(pos, VGet(0, m_wallCapsuleMaxY, 0)), m_radius, hp, hn))
-					return true;
-			}
-			return false;
-		};
-
-	// 5. 壁との衝突を計算し、押し出し先の位置を算出する
+	// 4. 壁との衝突を計算し、押し出し先の位置を算出する
 	VECTOR targetPos = VAdd(mvOldPosition, moveVec);
-	VECTOR avgNormal = VGet(0, 0, 0);
+	VECTOR avgNormal = VGet(0, 0, 0); // 衝突した複数の壁の法線を合成し、滑らかな壁際移動を実現する用
 	int hitCount = 0;
 
 	for (auto obj : stageList)
 	{
+		// dynamic_castのコストを抑えるため、ここで一度だけキャスト
 		Stage* pStage = dynamic_cast<Stage*>(obj);
 		if (!pStage) continue;
 
 		VECTOR hitPosWall, hitNormal;
+		// 目標地点で壁との衝突があるかチェック
 		if (pStage->CheckHit_Capsule_Wall(VAdd(targetPos, VGet(0, m_wallCapsuleMinY, 0)), VAdd(targetPos, VGet(0, m_wallCapsuleMaxY, 0)), m_radius, hitPosWall, hitNormal))
 		{
+			// 壁の法線ベクトル（Y軸方向は壁の傾きには影響させないため0にする）
 			VECTOR n = VGet(hitNormal.x, 0, hitNormal.z);
 			if (VSize(n) > 0.0001f)
 			{
 				avgNormal = VAdd(avgNormal, VNorm(n));
 				hitCount++;
+
+				// 衝突地点から押し出す距離を計算し、targetPosを補正
 				VECTOR capsuleCenter = VGet(targetPos.x, 0, targetPos.z);
 				VECTOR hitPointXZ = VGet(hitPosWall.x, 0, hitPosWall.z);
 				VECTOR vToCenter = VSub(capsuleCenter, hitPointXZ);
@@ -318,55 +316,48 @@ void Player3D::ResolveCollision3D()
 				if (dist < m_radius)
 				{
 					float pushLen = m_radius - dist;
+					// 押し出した後に壁にめり込み直さないよう少し余裕（0.05f）を持たせる
 					targetPos = VAdd(targetPos, VScale(VNorm(n), pushLen + 0.05f));
 				}
 			}
 		}
 	}
 
-	// 6. 壁に当たった場合、壁に沿って滑る移動計算を行う
+	// 5. 壁に沿った滑り移動計算（簡易的な壁擦り動作）
 	if (hitCount > 0 && VSize(avgNormal) > 0.0001f)
 	{
 		avgNormal = VNorm(avgNormal);
 		float dot = VDot(moveVec, avgNormal);
 		VECTOR slide = VSub(moveVec, VScale(avgNormal, dot));
-		VECTOR nextPos = VAdd(mvOldPosition, slide);
 
-		if (!CollidesAt(nextPos)) { mvPosition.x = nextPos.x; mvPosition.z = nextPos.z; }
-		else
-		{
-			VECTOR tryX = mvOldPosition; tryX.x += slide.x;
-			if (!CollidesAt(tryX)) mvPosition.x = tryX.x;
-			VECTOR tryZ = mvPosition; tryZ.z += slide.z;
-			if (!CollidesAt(tryZ)) mvPosition.z = tryZ.z;
-		}
+		// 最終的な滑り先位置を確定
+		mvPosition.x = mvOldPosition.x + slide.x;
+		mvPosition.z = mvOldPosition.z + slide.z;
 	}
 	else { mvPosition.x = targetPos.x; mvPosition.z = targetPos.z; }
 
-	// 7. Y軸方向の判定処理（床・天井）
+	// 6. Y軸方向の判定処理（床・天井の接地判定）
 	mvPosition.y = targetPos.y;
-	VECTOR floorNormal = VGet(0, 1, 0);
+	VECTOR floorNormal = VGet(0, 1, 0); // 基本的に床は水平とみなす
 
 	for (auto obj : stageList)
 	{
 		Stage* pStage = dynamic_cast<Stage*>(obj);
 		if (!pStage) continue;
 
-		// 8. 足元の複数地点に判定線分を降ろす
-		float step = m_floorLinePos;
-		VECTOR offsets[5] = { VGet(0, 0, 0), VGet(step, 0, 0), VGet(-step, 0, 0), VGet(0, 0, step), VGet(0, 0, -step) };
-
-		for (int i = 0; i < 5; ++i)
+		// 7. 足元の5地点に線分を降ろし、床を検出（精度向上）
+		for (const auto& offset : kOffsets)
 		{
-			VECTOR start = VAdd(mvPosition, VAdd(offsets[i], VGet(0, m_floorLineMinY, 0)));
-			VECTOR end = VAdd(mvPosition, VAdd(offsets[i], VGet(0, m_floorLineMaxY, 0)));
+			VECTOR start = VAdd(mvPosition, VAdd(offset, VGet(0, m_floorLineMinY, 0)));
+			VECTOR end = VAdd(mvPosition, VAdd(offset, VGet(0, m_floorLineMaxY, 0)));
 			VECTOR hitPos = pStage->CheckHit_Line(start, end);
 
-			DrawLine3D(start, end, GetColor(255, 0, 0)); // 判定ライン描画
+			DrawLine3D(start, end, GetColor(255, 0, 0)); // 判定ライン可視化（床）
 
 			if (VSize(hitPos) > 0.0001f)
 			{
 				isHitFloor = true;
+				// 最も高い位置を「足場」とする（階段等の段差対応）
 				if (hitPos.y > bestFloorY)
 				{
 					bestFloorY = hitPos.y;
@@ -376,23 +367,21 @@ void Player3D::ResolveCollision3D()
 			}
 		}
 
-		// 9. 頭上の天井判定を行う
+		// 8. 頭上の天井判定を行う
 		if (pStage->CheckHit_Capsule(VAdd(mvPosition, VGet(0, m_ceilCapsuleMinY, 0)), VAdd(mvPosition, VGet(0, m_ceilCapsuleMaxY, 0)), m_radius))
 		{
-			float m_ceilLinePos_val = m_ceilLinePos;
-			VECTOR LineSet[5] = { VGet(0,0,0), VGet(m_ceilLinePos_val,0,0), VGet(-m_ceilLinePos_val,0,0), VGet(0,0,m_ceilLinePos_val), VGet(0,0,-m_ceilLinePos_val) };
-			for (int i = 0; i < 5; i++)
+			for (const auto& offset : kOffsets)
 			{
-				VECTOR start = VAdd(mvPosition, VAdd(LineSet[i], VGet(0, m_ceilLineMinY, 0)));
-				VECTOR end = VAdd(mvPosition, VAdd(LineSet[i], VGet(0, m_ceilLineMaxY, 0)));
-				DrawLine3D(start, end, GetColor(0, 0, 255));
+				VECTOR start = VAdd(mvPosition, VAdd(offset, VGet(0, m_ceilLineMinY, 0)));
+				VECTOR end = VAdd(mvPosition, VAdd(offset, VGet(0, m_ceilLineMaxY, 0)));
+				DrawLine3D(start, end, GetColor(0, 0, 255)); // 判定ライン可視化（天井）
 				VECTOR hit = pStage->CheckHit_Line(start, end);
 				if (VSize(hit) > 0.0001f) { isHitCeiling = true; if (hit.y < ceilMinY) ceilMinY = hit.y; if (hit.y > ceilMaxY) ceilMaxY = hit.y; }
 			}
 		}
 	}
 
-	// 10. 接地判定があればプレイヤー位置を床に合わせる
+	// 9. 接地判定があればプレイヤーのY座標を床表面に補正する
 	if (isHitFloor && bestFloorY > -FLT_MAX)
 	{
 		float footY = mvPosition.y + m_floorCapsuleMinY - m_radius;
@@ -402,7 +391,7 @@ void Player3D::ResolveCollision3D()
 			mfYVelocity = 0;
 			mbIsGround = true; mbJump = false; mbFall = false;
 
-			// 11. モデルの傾きを床に合わせて補正する
+			// 10. モデルの傾きを床の法線に合わせて補正
 			{
 				VECTOR fn = floorNormal;
 				float worldTiltX = -asinf(fn.z);
@@ -416,9 +405,8 @@ void Player3D::ResolveCollision3D()
 				mpModel->SetRotation(mvRotation);
 			}
 
-			// 12. 急な坂道なら滑り落ちる処理を実行する
-			const float slideThreshold = 0.95f;
-			if (floorNormal.y < slideThreshold)
+			// 11. 急な坂道なら自動的に滑り落ちる処理
+			if (floorNormal.y < 0.95f)
 			{
 				VECTOR downDir = VGet(0.0f, -1.0f, 0.0f);
 				float dot = VDot(downDir, floorNormal);
@@ -428,17 +416,14 @@ void Player3D::ResolveCollision3D()
 					slideDir = VNorm(slideDir);
 					float slideStrength = (1.0f - floorNormal.y) * 30.0f;
 					if (slideStrength > 50.0f) slideStrength = 50.0f;
-					float horSpeed = VSize(VGet(moveVec.x, 0.0f, moveVec.z));
-					if (horSpeed > 0.001f) { VECTOR inputDir = VNorm(VGet(moveVec.x, 0.0f, moveVec.z)); float align = VDot(inputDir, slideDir); if (align < 0.0f) slideStrength *= 0.5f; }
 					mvPosition = VAdd(mvPosition, VScale(slideDir, slideStrength));
 				}
 			}
 		}
 	}
-	// 13. 非接地時はフラグを解除し、回転を元に戻す
 	else { mbIsGround = false; mvRotation.x *= 0.8f; mvRotation.z *= 0.8f; }
 
-	// 14. 法線リセットと天井衝突時のめり込み防止処理
+	// 12. 最終位置確定と天井衝突時のめり込み防止
 	if (!isHitFloor) floorNormal = VGet(0, 1, 0);
 	if (isHitCeiling)
 	{

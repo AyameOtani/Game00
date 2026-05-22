@@ -60,6 +60,12 @@ private:
 	float mfTargetAngle;  // 目標の回転値
 	VECTOR mvOldPosition; // 古いポジション
 
+	// 実際の前方向ベクトル
+	VECTOR mvForward = VGet(0.0f, 0.0f, 1.0f);
+	// 現在立っている床の法線
+	VECTOR mvFloorNormal = VGet(0.0f, 1.0f, 0.0f);
+
+
 	// ジャンプ関係
 	float mfJumpPower = 40.0f; // ジャンプ力
 	float mfGravity = -1.2f;    // 重力
