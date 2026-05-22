@@ -1,10 +1,11 @@
 ﻿#pragma once
-#include "Object3D.h"
-#include "Bullet3D.h"  // 【変更】Bullet3D クラスを使えるようにする
+#include "Character3D.h"
 #include <string>
 
+class Bullet3D;
+
 // プレイヤーを管理するクラス
-class Player3D : public Object3D
+class Player3D : public Character3D
 {
 private:
 	static constexpr float ROTATE_SPEED = 0.2f; // 回転速度

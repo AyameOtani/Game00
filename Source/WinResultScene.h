@@ -14,9 +14,3 @@ public:
     void Draw() override;        // 描画
     void Finalize() override;    // 終了
 };
-
-
-
-
-
-

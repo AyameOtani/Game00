@@ -9,12 +9,13 @@
 #include "ObjectManager.h"
 #include <algorithm>
 #include "Enemy3D.h"
+#include "Bullet3D.h"
 
 
 
 // コンストラクタ：プレイヤーの初期化
 Player3D::Player3D(VECTOR initPos, std::string filename)
-	: Object3D(initPos)
+	: Character3D(initPos, 50, Team::Player, 30.0f) // HP=100, チーム=Player, 半径=30
 	, mfAngle(0.0f)
 	, mfTargetAngle(0.0f)
 	, mvOldPosition(initPos)
@@ -78,6 +79,7 @@ void Player3D::DebugDraw()
 
 	int color = GetColor(255, 255, 255);
 	DrawFormatString(0, 20, color, "%.1f, %.1f, %.1f", mvPosition.x, mvPosition.y, mvPosition.z);
+	DrawFormatString(0, 40, GetColor(255, 255, 0), "HP: %d", m_hp);
 }
 
 // 更新処理：毎フレーム呼ばれるメインロジック
@@ -127,16 +129,19 @@ void Player3D::Draw()
 	Object3D::Draw();
 }
 
-// ショットの発射処理
 void Player3D::Shot()
 {
+	// クールタイムが終わっていなければ発射しない
 	if (mfShotTimer > 0.0f) return;
 
-	// プレイヤーの前方へ弾を生成
 	VECTOR spawnPos = VAdd(mvPosition, VGet(0.0f, 43.0f, 0.0f));
 	VECTOR shotDir = VGet(sinf(mfAngle), 0.0f, cosf(mfAngle));
-	new Bullet3D(spawnPos, "Resource/3D/Bullet/PlayerBullet.mqo", shotDir);
 
+	// 弾を生成（位置、モデル名、方向、陣営を渡す）
+	// ※Team::Playerを指定することで、味方撃ちを防ぐ
+	new Bullet3D(spawnPos, "Resource/3D/Bullet/PlayerBullet.mqo", shotDir, Team::Player);
+
+	// 発射後にクールタイムをセット
 	mfShotTimer = SHOT_INTERVAL;
 }
 

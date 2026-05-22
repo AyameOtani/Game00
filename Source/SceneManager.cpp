@@ -4,6 +4,7 @@
 #include "TitleScene.h"
 #include "GameScene.h"
 #include "WinResultScene.h"
+#include "LoseResultScene.h"
 
 SceneManager::SceneManager()
 	: mnSceneType(SCENE_TYPE::SCENE_NONE)
@@ -87,6 +88,10 @@ void SceneManager::ChangeSceneIfNeeded()
 
 	case SCENE_TYPE::WIN_RESULT_3D:
 		mpCurrentScene = new WinResultScene(); // 勝った時の3Dシーンの生成
+		break;
+
+	case SCENE_TYPE::LOSE_RESULT_3D:
+		mpCurrentScene = new LoseResultScene(); // 負けた時の3Dシーンの生成
 		break;
 
 	default:

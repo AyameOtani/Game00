@@ -11,6 +11,7 @@ Object2D::Object2D(std::string filename, VECTOR initPos)
 	: mvPosition(initPos)
 	, mbDeleteFlag(false)
 	, mpTextureAnimation(nullptr)
+	, mnTag(NONE2D) // タグの初期値は設定なし
 {
 	// 現在シーンのオブジェクトマネージジャーに自身 (this) を追加する
 	Master::mpSceneManager->GetCurrentScene()->GetObjectManager()->AddObject(this);
@@ -27,6 +28,7 @@ Object2D::Object2D(VECTOR initPos, std::string filename, int allNum, int numX, i
 	: mvPosition(initPos)
 	, mbDeleteFlag(false)
 	, mpTexture(nullptr)  // テクスチャーアニメーションの場合は画像一味表示の法は使用しない
+	, mnTag(NONE2D) // タグの初期値は設定なし
 {
 	// 現在のシーンの ObjectManager に自身（）this を追加
 	Master::mpSceneManager->GetCurrentScene()->GetObjectManager()->AddObject(this);
@@ -122,7 +124,7 @@ int  Object2D::GetSizeX()
 		return mpTextureAnimation->GetSizeX();
 	}
 
-	return 0.0f; // 上二つが生成されていない場合
+	return static_cast<int>(0.0f); // 上二つが生成されていない場合
 }
 
 // サイズY
@@ -139,5 +141,5 @@ int  Object2D::GetSizeY()
 		return mpTextureAnimation->GetSizeY();
 	}
 
-	return 0.0f; // 上二つが生成されていない場合
+	return static_cast<int>(0.0f); // 上二つが生成されていない場合
 }

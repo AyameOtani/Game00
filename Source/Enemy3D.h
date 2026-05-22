@@ -1,5 +1,5 @@
 #pragma once
-#include "Object3D.h"
+#include "Character3D.h"
 #include <string>
 
 class Model;
@@ -7,7 +7,7 @@ class Model;
 // =========================================================================
 // 敵を管理するクラス（最小限の表示用ベース版）
 // =========================================================================
-class Enemy3D : public Object3D
+class Enemy3D : public Character3D
 {
 
 public:
@@ -27,7 +27,11 @@ public:
 
 	void Update() override;
 	void Draw() override;
+	void DebugDraw(); // 描画デバッグ用
 	void ResolveCollision3D(); // 当たり判定の関数
+
+	void Shot(); // 発射処理
+
 
 public:
 	// ゲッターセッター
@@ -54,11 +58,16 @@ private:
 	float mfGroundY = 0.0f;  // 現在の床の高さ
 	bool  mbHitUp = false;   // 天井に頭が当たっているかフラグ
 
+	// ゲッターセッター
 public:
 	void SetID(int id) { m_id = id; }
 	int GetID() const { return m_id; }
 	
 
+	// 弾の処理
+private:
+	float mfShotTimer = 0.0f; // 攻撃用タイマー
+	static constexpr float SHOT_INTERVAL = 180.0f; // 3秒に1発（60fpsで180フレーム）
 
 private:
 	// -------------------------------------------------------------------------

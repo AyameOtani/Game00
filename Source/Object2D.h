@@ -14,6 +14,8 @@ public:    // enum, struct, 定数の定義
 	// Object2D だけだと何か分からないあの出見分けるためのタグ
 	enum Tag
 	{
+		NONE2D = 0, // 設定なし
+
 		Player2D = 2000,
 		Enemy2D = 2001,
 		Boss2D = 2002,

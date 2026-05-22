@@ -1,46 +1,36 @@
 #pragma once
 #include "Object3D.h"
+#include "Team.h"
 #include <string>
 
 class Model;
-class Enemy3D;
-class Player3D;
-class Unit;
+class Character3D;
 
 class Bullet3D : public Object3D
 {
 public:
-	// 敵の情報も受取るため追加
-	Bullet3D(
-		VECTOR initPos,             // 位置
-		std::string filename,       // モデル名前　弾のやつ
-		VECTOR Direction            // 角度　ホーミングのため
-	);
+    Bullet3D(VECTOR initPos, std::string filename, VECTOR Direction, Team shooterTeam);
+    ~Bullet3D();
 
+    void Update() override;
+    void Draw() override;
+    void Move();
 
-	~Bullet3D();
+    void HitStage();
+    void HitCharacter();
 
-	void Update();
-	void Draw();
-	void Move();
-
-	void HitStage(); // 壁とのあたり判定
-
-	void HitEnemy(); // 敵とのあたり判定
-	void HitPlayer();// プレイヤーとのあたり判定
-
-	float GetRadius() const { return m_radius; } // 当たり判定の半径を返すゲッター
-
+    float GetRadius() const { return m_radius; }
 
 private:
+    VECTOR mvDirection;
+    Team m_shooterTeam;
 
-	VECTOR mvDirection; // 向き
-	// 現在の目標角度
-	float mfAngle = 0.0f;
-	float mfMoveSpeed = 0.0f; // 動いた量で消すため
-	float mfSpeed = 40.0f; // 速さ
+    float mfMoveSpeed = 0.0f;
+    float mfSpeed = 40.0f;
+    float m_radius = 10.0f;
 
-	float m_radius = 10.0f; // 当たり判定の半径
+    // エフェクトの距離蓄積
+    float mEffectDistance = 0.0f;
 
-	Model* mpModel;
+    Model* mpModel = nullptr;
 };
