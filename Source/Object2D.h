@@ -6,11 +6,6 @@
 class Texture;
 class TextureAnimation;
 
-// 
-// 2D オブジェクトの基底クラス
-// 2D オブジェクト（プレイヤーや敵など）を作る際は、
-// 必ずこれを継承して作成する　
-// 
 class Object2D
 {
 public:    // enum, struct, 定数の定義
@@ -19,29 +14,10 @@ public:    // enum, struct, 定数の定義
 	// Object2D だけだと何か分からないあの出見分けるためのタグ
 	enum Tag
 	{
-		// ---★★★---
-		// タグの番号被ったらバグるから要注意 
-
-		// Titleシーンでつかわれるタグ（1000～）
-
-		// Gameシーンでつかわれるタグ（2000～）
 		Player2D = 2000,
 		Enemy2D = 2001,
 		Boss2D = 2002,
 		Map2D = 2100,
-
-		Boon2D = 2150,
-
-		// BossEnemy2D  = 2101,  // など、被らないようにに使う
-		Bullet2D = 2200,
-		HomingBullet2D = 2201,
-		EnemyBullet2D = 2202,
-		EnemyHomingBullet2D = 2203,
-		BossBullet2D = 2204,
-		ThreeBullet2D = 2205,
-		OffsetBullet2D = 2206,
-
-		// Resultシーンでつかわれるタグ（3000～）
 
 	};
 
@@ -57,7 +33,6 @@ public:
 	virtual ~Object2D(); // デストラクタ
 
 	virtual void Update(); //アップデート
-	// ★★  上書きされるかも知れないからvirtualをつける
 
 	virtual void Draw(); // 描画
 
@@ -79,7 +54,6 @@ public:   // ゲッター・セッター
 	int GetSizeY();  // 高さ
 
 
-	// ★New!! Zソート用★
 public: // ソート関数定義
 
 	// Zオーダーの設定
@@ -89,7 +63,8 @@ public: // ソート関数定義
 	// Zオーダーを基準にソートする
 	// Zオーダーの数値が大きいほど手前に来る
 	struct CompareZOrder {
-		bool operator()(Object2D* a, Object2D* b) const {
+		bool operator()(Object2D* a, Object2D* b) const
+		{
 			return a->GetPosition().z < b->GetPosition().z;
 		}
 	};
@@ -106,16 +81,3 @@ private:
 	bool mbDeleteFlag;    // 削除フラグ(これがtrue になっていると自動的に削除される（ように作る）)
 	Tag mnTag;            // オブジェクトを見分ける用のタグ
 };
-
-/*
-// 一枚画像用のクラス
-class Tecture2D : public Object2D
-{
-
-};
-
-// テクスチャアニメーション用のクラス
-class TectureAnimation2D : public Object2D
-{
-
-};*/

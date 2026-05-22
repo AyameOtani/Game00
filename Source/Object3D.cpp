@@ -18,9 +18,6 @@ Object3D::Object3D(VECTOR initPos)
 	//mpModel = new Model(filename, initPos);
 
 	// 現在シーンの ObjectManager に自身(this) を追加する
-	// 
-	// ★★  AddObject は名前を変えていないのに呼びだせる
-	//       -> 同じ名前の時は、引数の型や個数が違う場合なら同じ関数名を使える
 	Master::mpSceneManager->GetCurrentScene()->GetObjectManager()->AddObject(this);
 }
 
@@ -45,7 +42,6 @@ void Object3D::LateUpdate()
 		mpModel->GetPosition();
 		mpModel->SetPosition(mvPosition);
 		mpModel->SetRotation(mvRotation);
-
 	}
 }
 

@@ -82,44 +82,44 @@ void GameScene::Update()
 	auto playerList = Master::mpSceneManager->GetCurrentScene()
 		->GetObjectManager()->GetObject3DListByTag(Object3D::T_Player3D);
 
-	// プレイヤーが一人でも存在する場合のみ操作可能にする
-	if (!playerList.empty())
-	{
-		// リストの先頭をプレイヤーとして扱う
-		Player3D* pPlayer = dynamic_cast<Player3D*>(playerList[0]);
+	//// プレイヤーが一人でも存在する場合のみ操作可能にする
+	//if (!playerList.empty())
+	//{
+	//	// リストの先頭をプレイヤーとして扱う
+	//	Player3D* pPlayer = dynamic_cast<Player3D*>(playerList[0]);
 
-		// --- ID切り替えの操作 (6キーで戻る, 7キーで進む) ---
-		if (InputManager::CheckDownKey(KEY_INPUT_6)) m_selectedId--;
-		if (InputManager::CheckDownKey(KEY_INPUT_7)) m_selectedId++;
+	//	// --- ID切り替えの操作 (6キーで戻る, 7キーで進む) ---
+	//	if (InputManager::CheckDownKey(KEY_INPUT_6)) m_selectedId--;
+	//	if (InputManager::CheckDownKey(KEY_INPUT_7)) m_selectedId++;
 
-		// 範囲制限
-		if (m_selectedId < 0) m_selectedId = 0;
-		if (m_selectedId >= (int)m_enemyList.size()) m_selectedId = (int)m_enemyList.size() - 1;
+	//	// 範囲制限
+	//	if (m_selectedId < 0) m_selectedId = 0;
+	//	if (m_selectedId >= (int)m_enemyList.size()) m_selectedId = (int)m_enemyList.size() - 1;
 
-		// --- 3キーで移動処理 ---
-		// 3キーが押された時の移動処理内
-		if (InputManager::CheckDownKey(KEY_INPUT_3))
-		{
-			if (m_selectedId >= 0 && m_selectedId < (int)m_enemyList.size())
-			{
-				// 敵の座標を移動
-				m_enemyList[m_selectedId]->SetPosition(pPlayer->GetPosition());
+	//	// --- 3キーで移動処理 ---
+	//	// 3キーが押された時の移動処理内
+	//	if (InputManager::CheckDownKey(KEY_INPUT_3))
+	//	{
+	//		if (m_selectedId >= 0 && m_selectedId < (int)m_enemyList.size())
+	//		{
+	//			// 敵の座標を移動
+	//			m_enemyList[m_selectedId]->SetPosition(pPlayer->GetPosition());
 
-				// 保存用リストを更新する（もし既にIDがあれば更新、なければ追加）
-				bool found = false;
-				for (auto& data : m_savedEnemyList) {
-					if (data.id == m_selectedId) {
-						data.pos = pPlayer->GetPosition();
-						found = true;
-						break;
-					}
-				}
-				if (!found) {
-					m_savedEnemyList.push_back({ m_selectedId, pPlayer->GetPosition() });
-				}
-			}
-		}
-	}
+	//			// 保存用リストを更新する（もし既にIDがあれば更新、なければ追加）
+	//			bool found = false;
+	//			for (auto& data : m_savedEnemyList) {
+	//				if (data.id == m_selectedId) {
+	//					data.pos = pPlayer->GetPosition();
+	//					found = true;
+	//					break;
+	//				}
+	//			}
+	//			if (!found) {
+	//				m_savedEnemyList.push_back({ m_selectedId, pPlayer->GetPosition() });
+	//			}
+	//		}
+	//	}
+	//}
 
 	SaveEnemyDataToFile();
 	// 基底クラスの更新処理を呼びだす
@@ -154,7 +154,7 @@ void GameScene::Draw()
 	//}
 
 	// 現在の選択IDを表示
-	DrawFormatString(0, 0, GetColor(255, 255, 255), "Selected Enemy ID: %d / %d", m_selectedId, (int)m_enemyList.size() - 1);
+	//DrawFormatString(0, 0, GetColor(255, 255, 255), "Selected Enemy ID: %d / %d", m_selectedId, (int)m_enemyList.size() - 1);
 
 	// 基底クラスの更新処理を呼びだす
 	Scene::Draw();
@@ -168,12 +168,12 @@ void GameScene::Finalize()
 
 void GameScene::SaveEnemyDataToFile()
 {
-	std::ofstream ofs("EnemyPlacement.txt");
-	for (const auto& data : m_savedEnemyList)
-	{
-		// IDと座標をテキストで保存
-		ofs << "ID: " << data.id
-			<< " Pos: " << data.pos.x << ", " << data.pos.y << ", " << data.pos.z
-			<< std::endl;
-	}
+	//std::ofstream ofs("EnemyPlacement.txt");
+	//for (const auto& data : m_savedEnemyList)
+	//{
+	//	// IDと座標をテキストで保存
+	//	ofs << "ID: " << data.id
+	//		<< " Pos: " << data.pos.x << ", " << data.pos.y << ", " << data.pos.z
+	//		<< std::endl;
+	//}
 }

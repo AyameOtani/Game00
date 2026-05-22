@@ -35,13 +35,10 @@ Object2D::Object2D(VECTOR initPos, std::string filename, int allNum, int numX, i
 	mpTextureAnimation = new TextureAnimation(initPos, filename, allNum, numX, numY, interval);
 }
 
-// コンストラクタ（マップ用）
-//Object2D::Object2D(VECTOR initPos, std::string filename)
 
 // デストラクタ
 Object2D::~Object2D()
 {
-
 	// 画像破棄
 	if (mpTexture != nullptr)
 	{
@@ -72,8 +69,6 @@ void Object2D::Update()
 		mpTextureAnimation->Update();
 
 		// 座標設定
-		// こっちでもプレイヤーの奴をやっているから
-		// プレイヤーのUp0dateに書かなくてもok
 		mpTextureAnimation->SetPosition(mvPosition);
 	}
 
