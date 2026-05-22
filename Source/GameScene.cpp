@@ -62,7 +62,7 @@ void GameScene::Initialize()
 void GameScene::Update()
 {
 	// ショートカットで次シーン指定
-	if (InputManager::CheckDownKey(KEY_INPUT_RETURN))
+	if (InputManager::CheckDownKey(KEY_INPUT_9))
 	{
 		Master::mpSceneManager->SetNextScene(SceneManager::SCENE_TYPE::WIN_RESULT_3D);
 	}

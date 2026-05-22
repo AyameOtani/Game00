@@ -29,6 +29,19 @@ public:
 
 	void DebugDraw(); // 描画デバッグ用
 
+	// あたり判定の中心 使ってはいない
+	VECTOR GetHitCenter() const override
+	{
+		return VAdd(mvPosition, VGet(0.0f, 60.0f, 0.0f));
+	}
+
+	// 半径
+	float GetRadius() const override
+	{
+		return m_radius;
+	}
+
+	// ゲッターセッター
 private:
 	Model* mpModel; // プレイヤーの3Dモデルを管理するポインタ
 
@@ -63,12 +76,13 @@ private:
 	bool  mbHitUp = false;   // 天井に頭が当たっているかフラグ
 
 
+
 private:
 	// -------------------------------------------------------------------------
 	// 当たり判定カプセル用パラメータ
 	// -------------------------------------------------------------------------
 	// ★共通の半径
-	float m_radius;           // すべてのカプセルで共通の半径（50.0f）
+	float m_radius = 30.0f;           // すべてのカプセルで共通の半径（50.0f）
 
 	// 床判定用位置 (緑)
 	float m_floorCapsuleMinY;

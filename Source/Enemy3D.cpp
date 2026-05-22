@@ -12,7 +12,7 @@
 // コンストラクタ
 // =========================================================================
 Enemy3D::Enemy3D(VECTOR initPos, std::string filename, EnemyType type)
-	: Character3D(initPos, 20, Team::Enemy, 30.0f) // HP=20, チーム=Player, 半径=30
+	: Character3D(initPos, 20, Team::Enemy, 60.0f) // HP=20, チーム=Player, 半径=30
 	, m_type(type) // 敵タイプを初期化
 	, mfAngle(0.0f)
 	, mfTargetAngle(0.0f)
@@ -24,27 +24,7 @@ Enemy3D::Enemy3D(VECTOR initPos, std::string filename, EnemyType type)
 	// 敵用の3Dモデルを生成して初期位置に配置
 	mpModel = new Model(filename, initPos);
 
-
-
-	m_radius = 30.0f; // 敵の当たり判定半径
-
-	// 床判定用の各高さ設定
-	m_floorCapsuleMinY = 3.0f;
-	m_floorCapsuleMaxY = 40.0f;
-	m_floorLinePos = 25.0f;
-	m_floorLineMinY = 20.0f;
-	m_floorLineMaxY = -300.0f;
-
-	// 壁判定用の各高さ設定
-	m_wallCapsuleMinY = 40.0f;
-	m_wallCapsuleMaxY = 60.0f;
-
-	// 天井判定用の各高さ設定
-	m_ceilCapsuleMinY = 60.0f;
-	m_ceilCapsuleMaxY = 80.0f;
-	m_ceilLinePos = 15.0f;
-	m_ceilLineMinY = 70.0f;
-	m_ceilLineMaxY = 100.0f;
+	m_radius = 60.0f; // 敵の当たり判定半径
 
 	SetFontSize(20);
 }
@@ -113,9 +93,8 @@ void Enemy3D::Draw()
 
 void Enemy3D::DebugDraw()
 {
-	// デバッグ用：敵のあたり判定の球体をワイヤーフレームで描画（緑色）
-	float bulletRadius = 40.0f;
-	DrawSphere3D(mvPosition, bulletRadius, 8, GetColor(0, 255, 0), GetColor(0, 255, 0), false);
+	// デバッグ用：敵のあたり判定の球体をワイヤーフレームで描画（白色）
+	DrawSphere3D(VAdd(mvPosition, VGet(0.0f, 10.0f, 0.0f)), m_radius, 8, GetColor(255, 255, 255), GetColor(0, 255, 0), false);
 
 
 	// この敵インスタンス自体のメモリアドレスを数値として扱う
@@ -129,7 +108,7 @@ void Enemy3D::DebugDraw()
 	unsigned int color = GetColor(r, g, b);
 
 	// 敵の頭上の座標へ
-	VECTOR posForLabel = VAdd(mvPosition, VGet(0.0f, 60.0f, 0.0f));
+	VECTOR posForLabel = VAdd(mvPosition, VGet(0.0f, 80.0f, 0.0f));
 	VECTOR screenPos = DxLib::ConvWorldPosToScreenPos(posForLabel);
 
 	if (screenPos.z >= 0.0f)
@@ -137,7 +116,7 @@ void Enemy3D::DebugDraw()
 		DrawFormatString(
 			static_cast<int>(screenPos.x),
 			static_cast<int>(screenPos.y),
-			color, // ★ここで計算した色を使う
+			color,
 			"Enemy HP: %d",
 			m_hp
 		);

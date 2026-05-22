@@ -29,13 +29,7 @@ public:
 	void Draw() override;
 	void DebugDraw(); // 描画デバッグ用
 	void ResolveCollision3D(); // 当たり判定の関数
-
 	void Shot(); // 発射処理
-
-
-public:
-	// ゲッターセッター
-	float GetRadius() const { return m_radius; }
 
 
 private:
@@ -62,39 +56,51 @@ private:
 public:
 	void SetID(int id) { m_id = id; }
 	int GetID() const { return m_id; }
-	
+
+
+	// Character3D クラスからのオーバーライド：当たり判定の中心位置を返す
+	VECTOR GetHitCenter() const override
+	{
+		return VAdd(mvPosition, VGet(0.0f, 10.0f, 0.0f));
+	}
+
+	float GetRadius() const override
+	{
+		return m_radius;
+	}
+
 
 	// 弾の処理
 private:
 	float mfShotTimer = 0.0f; // 攻撃用タイマー
-	static constexpr float SHOT_INTERVAL = 180.0f; // 3秒に1発（60fpsで180フレーム）
+	static constexpr float SHOT_INTERVAL = 60.0f; // 弾をうつ間隔
 
 private:
 	// -------------------------------------------------------------------------
 	// 当たり判定カプセル用パラメータ
 	// -------------------------------------------------------------------------
 	// ★共通の半径
-	float m_radius;           // すべてのカプセルで共通の半径（50.0f）
+	float m_radius = 60.0f;           // すべてのカプセルで共通の半径（50.0f）
 
-	// 床判定用位置 (緑)
-	float m_floorCapsuleMinY;
-	float m_floorCapsuleMaxY;
-	float m_floorLinePos;
-	float m_floorLineMinY;
-	float m_floorLineMaxY;
-	// 床判定でラインのどちらを採用するか（true=最高点、false=最低点）
-	bool m_floorUseHighest = true;
+	//// 床判定用位置 (緑)
+	//float m_floorCapsuleMinY;
+	//float m_floorCapsuleMaxY;
+	//float m_floorLinePos;
+	//float m_floorLineMinY;
+	//float m_floorLineMaxY;
+	//// 床判定でラインのどちらを採用するか（true=最高点、false=最低点）
+	//bool m_floorUseHighest = true;
 
-	// 壁判定用位置 (赤)
-	float m_wallCapsuleMinY;
-	float m_wallCapsuleMaxY;
+	//// 壁判定用位置 (赤)
+	//float m_wallCapsuleMinY;
+	//float m_wallCapsuleMaxY;
 
-	// 天井判定用位置 (青)
-	float m_ceilCapsuleMinY;
-	float m_ceilCapsuleMaxY;
-	float m_ceilLinePos;
-	float m_ceilLineMinY;
-	float m_ceilLineMaxY;
+	//// 天井判定用位置 (青)
+	//float m_ceilCapsuleMinY;
+	//float m_ceilCapsuleMaxY;
+	//float m_ceilLinePos;
+	//float m_ceilLineMinY;
+	//float m_ceilLineMaxY;
 	// 天井判定でラインのどちらを採用するか（true=最低点、false=最高点）
 	bool m_ceilUseLowest = true;
 

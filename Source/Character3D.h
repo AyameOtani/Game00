@@ -17,7 +17,29 @@ public:
 
     //　チーム関係
     Team GetTeam() const { return m_team; }
-    float GetRadius() const { return m_radius; }
+   
+
+	// 子クラスでオーバーライドして、あたり判定の中心を調整できるようにする
+public: 
+    // あたり判定について
+    virtual VECTOR GetHitCenter() const
+    {
+        // デフォはそのまま
+		return VAdd(mvPosition, VGet(0.0f, 0.0f, 0.0f)); // キャラクターの中心より少し上を当たり判定の中心にする
+    }
+
+
+    virtual VECTOR GetCapsuleTop() const
+    {
+        return VAdd(mvPosition, VGet(0.0f, 60.0f, 0.0f));
+    }
+
+    virtual VECTOR GetCapsuleBottom() const
+    {
+        return VAdd(mvPosition, VGet(0.0f, 0.0f, 0.0f));
+    }
+
+    virtual float GetRadius() const { return m_radius; }
 
 protected:
     int m_maxHp;
