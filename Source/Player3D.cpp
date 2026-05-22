@@ -133,7 +133,7 @@ void Player3D::Shot()
 	if (mfShotTimer > 0.0f) return;
 
 	// プレイヤーの前方へ弾を生成
-	VECTOR spawnPos = VAdd(mvPosition, VGet(0.0f, 53.0f, 0.0f));
+	VECTOR spawnPos = VAdd(mvPosition, VGet(0.0f, 43.0f, 0.0f));
 	VECTOR shotDir = VGet(sinf(mfAngle), 0.0f, cosf(mfAngle));
 	new Bullet3D(spawnPos, "Resource/3D/Bullet/PlayerBullet.mqo", shotDir);
 
@@ -233,6 +233,13 @@ void Player3D::Jump()
 	mfYVelocity += mfGravity; // 重力加算
 	if (mfYVelocity < -mfMaxFallSpeed) mfYVelocity = -mfMaxFallSpeed; // 落下速度制限
 	mvPosition.y += mfYVelocity;
+
+	// デバッグ用
+	if (CheckHitKey(KEY_INPUT_0))
+	{
+		mfYVelocity = 20.0f;
+		mbIsGround = false;
+	}
 }
 
 
