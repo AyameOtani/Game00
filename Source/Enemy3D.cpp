@@ -69,6 +69,15 @@ void Enemy3D::Update()
 	// フレーム開始時の位置を保存（ResolveCollision3D が参照する）
 	mvOldPosition = mvPosition;
 
+
+	// 重力 これで落下ありになる
+	mfYVelocity += mfGravity;
+	mvPosition.y += mfYVelocity;
+
+	// 落下したときは削除
+	if (mvPosition.y < -4000.0f) SetDeleteFlag(true);
+
+
 	// シンプルな射撃タイマー（Attacker のみ）
 	if (m_type == Attacker)
 	{

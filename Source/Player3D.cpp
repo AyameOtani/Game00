@@ -77,6 +77,9 @@ void Player3D::Update()
 	// 共通化した Character3D::ResolveCollision3D を利用する
 	ResolveCollision3D();
 
+	// キャラ同士の押し戻し
+	ResolveCharacterPush();
+
 	// モデル同期（位置・回転をモデルに反映）
 	SyncModel();
 
@@ -206,12 +209,33 @@ void Player3D::RotationByMove()
 {
 	float subAngle = mfTargetAngle - mfAngle;
 	// 角度を-PIからPIの範囲に正規化
-	if (subAngle < -DX_PI_F) subAngle += DX_TWO_PI_F;
-	else if (subAngle > DX_PI_F) subAngle -= DX_TWO_PI_F;
+	if (subAngle < -DX_PI_F)
+	{
+		subAngle += DX_TWO_PI_F;
+	}
+	else if (subAngle > DX_PI_F)
+	{
+		subAngle -= DX_TWO_PI_F;
+	}
 
 	// スムーズに回転させる処理
-	if (subAngle > 0.0f) { subAngle -= ROTATE_SPEED; if (subAngle < 0.0f) subAngle = 0.0f; }
-	else if (subAngle < 0.0f) { subAngle += ROTATE_SPEED; if (subAngle > 0.0f) subAngle = 0.0f; }
+	if (subAngle > 0.0f)
+
+	{	subAngle -= ROTATE_SPEED;
+
+		if (subAngle < 0.0f)
+		{
+			subAngle = 0.0f;
+		}
+	}
+	else if (subAngle < 0.0f)
+	{
+		subAngle += ROTATE_SPEED;
+		if (subAngle > 0.0f)
+		{
+			subAngle = 0.0f;
+		}
+	}
 
 	mfAngle = mfTargetAngle - subAngle;
 	mvRotation.y = mfAngle + DX_PI_F;
@@ -220,6 +244,7 @@ void Player3D::RotationByMove()
 
 void Player3D::Jump()
 {
+	// スペースを押していたらジャンプ（地面にいるときのみ）
 	if (mbIsGround && (InputManager::CheckDownKey(KEY_INPUT_SPACE) || (GetJoypadInputState(DX_INPUT_PAD1) & PAD_INPUT_1)))
 	{
 		mfYVelocity = mfJumpPower;
@@ -230,7 +255,7 @@ void Player3D::Jump()
 	if (mfYVelocity < -mfMaxFallSpeed) mfYVelocity = -mfMaxFallSpeed; // 落下速度制限
 	mvPosition.y += mfYVelocity;
 
-	// デバッグ用
+	// デバッグ用 飛べる
 	if (CheckHitKey(KEY_INPUT_0))
 	{
 		mfYVelocity = 20.0f;
@@ -241,10 +266,62 @@ void Player3D::Jump()
 // SyncModel: モデルを持つ派生クラスはここで位置・回転を反映する
 void Player3D::SyncModel()
 {
+	// 位置をセットする
 	if (mpModel)
 	{
 		mpModel->SetPosition(mvPosition);
 		mpModel->SetRotation(mvRotation);
 		mpModel->Update();
+	}
+}
+
+
+// キャラクター同士の押し戻し処理（Player vs Enemy）
+void Player3D::ResolveCharacterPush()
+{
+	// Enemy一覧を取得
+	auto enemyList =
+		Master::mpSceneManager->GetCurrentScene()
+		->GetObjectManager()
+		->GetObject3DListByTag(Object3D::T_Enemy3D);
+
+	// 衝突判定用の許容誤差
+	constexpr float kEpsilon = 1.0f / 1000.0f;
+
+	// 敵のリスト回す
+	for (auto obj : enemyList)
+	{
+		Enemy3D* enemy = dynamic_cast<Enemy3D*>(obj);
+		if (!enemy) continue;
+
+		// Player から Enemy 方向ベクトル
+		VECTOR diff = VSub(mvPosition, enemy->GetPosition());
+		float dist = VSize(diff);
+
+		float playerRadius = m_radius;
+		float enemyRadius = enemy->GetRadius(); // 敵の当たり判定の半径
+		float minDist = playerRadius + enemyRadius;
+
+		// 距離が近すぎる そもそも当たっていない場合は処理しない
+		if (dist < kEpsilon || dist >= minDist)
+			continue;
+
+		// 押し戻し方向  正規化ベクトル
+		VECTOR dir = VScale(diff, 1.0f / dist);
+
+		// めり込み量  重なりの深さ
+		float penetration = minDist - dist;
+
+		// Playerのみ押し戻す
+		mvPosition = VAdd(
+			mvPosition,
+			VScale(dir, penetration)
+		);
+
+		 // Enemyも動かす場合の拡張例
+		 enemy->SetPosition(
+		     VSub(enemy->GetPosition(),
+		         VScale(dir, penetration * 0.5f))
+		 );
 	}
 }

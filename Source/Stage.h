@@ -13,7 +13,8 @@ public:
 	{
 		Static,    // “®‚©‚È‚¢
 		Moving,    // •½sˆÚ“®‚·‚é
-		Rotating   // ‰ñ“]‚·‚é
+		Rotating,   // ‰ñ“]‚·‚é
+		LittleRotation // ­‚µ‚Ì‰ñ“]
 	};
 
 public:

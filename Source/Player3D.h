@@ -21,6 +21,7 @@ public:
 
 	void MoveEx();
 	void RotationByMove();
+	void ResolveCharacterPush(); // キャラの押し戻し処理
 	void Jump();
 	void DrawHp(); // HPの画像の描画
 
