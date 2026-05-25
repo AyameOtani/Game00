@@ -95,22 +95,16 @@ void GameScene::Update()
 	}
 
 
-	auto rawEnemyList =
-		Master::mpSceneManager->GetCurrentScene()
-		->GetObjectManager()->GetObject3DListByTag(Object3D::T_Enemy3D);
-
 	// スナップショットを作成
 	std::vector<Object3D*> players = rawPlayerList;
-	std::vector<Object3D*> enemies = rawEnemyList;
 
 	bool playersEmpty = players.empty();
-	bool enemiesEmpty = enemies.empty();
 
 	// 両方空 or いずれか空 の場合、安全に一度だけシーン切替を予約して早期リターン
-	if (playersEmpty || enemiesEmpty)
+	if (playersEmpty)
 	{
-		// 優先度：プレイヤーが居なければLOSE、それ以外は敵が居なければWIN
-		if (playersEmpty && !enemiesEmpty)
+		// 優先度 プレイヤーが居なければLOSE、それ以外は敵が居なければWIN
+		if (playersEmpty)
 		{
 			Master::mpSceneManager->SetNextScene(SceneManager::SCENE_TYPE::LOSE_RESULT_3D);
 		}

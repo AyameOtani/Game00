@@ -87,7 +87,7 @@ protected:
 	float mfAirDecel = 10.0f;
 
 	// ジャンプ・重力
-	float mfJumpPower = 35.0f;
+	float mfJumpPower = 30.0f;
 	float mfGravity = -1.2f;
 	float mfMaxFallSpeed = 60.0f;
 };
