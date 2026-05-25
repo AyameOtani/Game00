@@ -74,11 +74,25 @@ void GameScene::Update()
 		Master::mpSceneManager->GetCurrentScene()
 		->GetObjectManager()->GetObject3DListByTag(Object3D::T_Player3D);
 
+	// プレイヤーの勝利判定
+	for (auto* obj : rawPlayerList)
+	{
+		// Player3D にキャストして位置を取得
+		Player3D* player = dynamic_cast<Player3D*>(obj);
+		// 弁当箱の位置だったら
+		if (player && player->GetPosition().z > 15500.0f && player->GetPosition().y > 500)
+		{
+			Master::mpSceneManager->SetNextScene(SceneManager::SCENE_TYPE::WIN_RESULT_3D);
+			return; // 遷移予約したら早期リターン
+		}
+	}
+
+
 	auto rawEnemyList =
 		Master::mpSceneManager->GetCurrentScene()
 		->GetObjectManager()->GetObject3DListByTag(Object3D::T_Enemy3D);
 
-	// スナップショット（コピー）を作成
+	// スナップショットを作成
 	std::vector<Object3D*> players = rawPlayerList;
 	std::vector<Object3D*> enemies = rawEnemyList;
 

@@ -8,47 +8,68 @@
 #include <cmath>
 
 
-// =========================================================================
+int Enemy3D::s_nextEnemyID = 0;
+
 // コンストラクタ
-// =========================================================================
 Enemy3D::Enemy3D(VECTOR initPos, std::string filename, EnemyType type)
-	: Character3D(initPos, 20, Team::Enemy, 60.0f) // HP=20, チーム=Player, 半径=30
-	, m_type(type) // 敵タイプを初期化
+	: Character3D(initPos, 20, Team::Enemy, 60.0f)
+	, m_type(type)
 	, mfAngle(0.0f)
 	, mfTargetAngle(0.0f)
-	, mvOldPosition(initPos)
 	, mfShotTimer(0.0f)
+	, mpModel(nullptr)
 {
-	// 自身の mnTag に敵のタグ（T_Enemy3D）をセットして識別できるようにする
 	SetTag(Object3D::T_Enemy3D);
-	// 敵用の3Dモデルを生成して初期位置に配置
+
+	// モデル生成
 	mpModel = new Model(filename, initPos);
 
-	m_radius = 60.0f; // 敵の当たり判定半径
+	// 判定用パラメータを派生で設定（天井含む）
+	m_radius = 60.0f;
+	m_ceilRadius = 75.0f; // 天井判定用半径
+
+
+	// 床判定
+	m_floorCapsuleMinY = 3.0f;
+	m_floorCapsuleMaxY = 40.0f;
+	m_floorLinePos = 30.0f;
+	m_floorLineMinY = 20.0f;
+	m_floorLineMaxY = -300.0f;
+
+	// 壁判定
+	m_wallCapsuleMinY = 40.0f;
+	m_wallCapsuleMaxY = 60.0f;
+
+	// 天井判定
+	m_ceilCapsuleMinY = 50.0f;
+	m_ceilCapsuleMaxY = 80.0f;
+	m_ceilLinePos = 30.0f;
+	m_ceilLineMinY = 70.0f;
+	m_ceilLineMaxY = 100.0f;
+
+
+	m_id = s_nextEnemyID++;
 
 	SetFontSize(20);
 }
 
-// =========================================================================
 // デストラクタ
-// =========================================================================
 Enemy3D::~Enemy3D()
 {
-	// 生成した3Dモデルを安全に削除
-	if (mpModel != nullptr)
+	if (mpModel)
 	{
 		delete mpModel;
 		mpModel = nullptr;
 	}
 }
 
-// =========================================================================
-// 更新処理（今は位置を同期させるだけ）
-// =========================================================================
+// 更新処理
 void Enemy3D::Update()
 {
+	// フレーム開始時の位置を保存（ResolveCollision3D が参照する）
+	mvOldPosition = mvPosition;
 
-	// Attackerタイプなら攻撃タイマーを更新
+	// シンプルな射撃タイマー（Attacker のみ）
 	if (m_type == Attacker)
 	{
 		if (mfShotTimer > 0.0f)
@@ -62,79 +83,104 @@ void Enemy3D::Update()
 		}
 	}
 
+	// 共通の衝突解決（床・壁・天井）
+	ResolveCollision3D();
 
-	// モデルの位置を現在の座標（mvPosition）に同期
-	if (mpModel != nullptr)
-	{
-		mpModel->SetPosition(mvPosition);
-		mpModel->Update();
-	}
-	
-	// 基底クラス（Object3D）のUpdateを呼び出す
+	// モデルの位置・回転同期（派生で実装）
+	SyncModel();
+
+	// 基底更新
 	Object3D::Update();
 }
 
-// =========================================================================
 // 描画処理
-// =========================================================================
 void Enemy3D::Draw()
 {
-	// 敵の3Dモデルを描画
-	if (mpModel != nullptr)
-	{
-		mpModel->Draw();
-	}
+	if (mpModel) mpModel->Draw();
 
-	DebugDraw(); // デバッグ用の描画
+	// 共通デバッグ（Character3D::DebugDraw を利用）
+	DebugDraw();
 
-	// 基底クラス（Object3D）のDrawを呼び出す
 	Object3D::Draw();
 }
 
+// デバッグ描画
 void Enemy3D::DebugDraw()
 {
-	// デバッグ用：敵のあたり判定の球体をワイヤーフレームで描画（白色）
-	DrawSphere3D(VAdd(mvPosition, VGet(0.0f, 10.0f, 0.0f)), m_radius, 8, GetColor(255, 255, 255), GetColor(0, 255, 0), false);
+	// 当たり判定の球体（可視化）
+	DrawSphere3D(VAdd(mvPosition, VGet(0.0f, 10.0f, 0.0f)), m_radius, 8,
+		GetColor(255, 255, 255), GetColor(0, 255, 0), false);
 
-
-	// この敵インスタンス自体のメモリアドレスを数値として扱う
-	uintptr_t address = reinterpret_cast<uintptr_t>(this);
-
-	// アドレスを使って、赤・緑・青の値をランダムっぽく作る
-	int r = static_cast<int>((address % 3) * 127 + 128); // 128～255の間
-	int g = static_cast<int>(((address / 100) % 3) * 127 + 128);
-	int b = static_cast<int>(((address / 10000) % 3) * 127 + 128);
-
-	unsigned int color = GetColor(r, g, b);
-
-	// 敵の頭上の座標へ
+	// HP ラベル（スクリーン座標へ変換）
 	VECTOR posForLabel = VAdd(mvPosition, VGet(0.0f, 80.0f, 0.0f));
 	VECTOR screenPos = DxLib::ConvWorldPosToScreenPos(posForLabel);
-
 	if (screenPos.z >= 0.0f)
 	{
 		DrawFormatString(
 			static_cast<int>(screenPos.x),
 			static_cast<int>(screenPos.y),
-			color,
-			"Enemy HP: %d",
+			GetColor(255, 200, 100),
+			"ID:%d HP:%d",
+			m_id,
 			m_hp
 		);
 	}
+
+
+	auto rawEnemyList =
+		Master::mpSceneManager->GetCurrentScene()
+		->GetObjectManager()->GetObject3DListByTag(Object3D::T_Enemy3D);
+
+	int i = 0;
+
+	for (auto* obj : rawEnemyList)
+	{
+		Enemy3D* e = dynamic_cast<Enemy3D*>(obj);
+		if (!e) continue;
+
+		VECTOR p = e->GetPosition();
+
+		DrawFormatString(
+			10, 100 + i * 20,
+			GetColor(255, 255, 0),
+			"ID:%d Pos:(%.1f,%.1f,%.1f)",
+			e->GetID(),
+			p.x, p.y, p.z
+		);
+
+		i++;
+	}
 }
 
-// =========================================================================
-// 弾の発射処理
-// =========================================================================
+// 弾発射
 void Enemy3D::Shot()
 {
-	// Attacker以外なら発射しない
 	if (m_type != Attacker) return;
 
-	// 弾の発射位置と方向の計算
 	VECTOR spawnPos = VAdd(mvPosition, VGet(0.0f, 30.0f, 0.0f));
 	VECTOR shotDir = VGet(sinf(mfAngle), 0.0f, cosf(mfAngle));
 
-	// 弾の生成（敵陣営として）
 	new Bullet3D(spawnPos, "Resource/3D/Bullet/EnemyBullet.mqo", shotDir, Team::Enemy);
+}
+
+// モデル同期（Character3D::SyncModel の実装）
+void Enemy3D::SyncModel()
+{
+	if (mpModel)
+	{
+		mpModel->SetPosition(mvPosition);
+		mpModel->SetRotation(mvRotation);
+		mpModel->Update();
+	}
+}
+
+// ヒット判定用中心
+VECTOR Enemy3D::GetHitCenter() const
+{
+	return VAdd(mvPosition, VGet(0.0f, 10.0f, 0.0f));
+}
+
+float Enemy3D::GetRadius() const
+{
+	return Character3D::GetRadius();
 }
