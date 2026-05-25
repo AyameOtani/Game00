@@ -149,13 +149,16 @@ void Character3D::ResolveCollision3D()
 
 	VECTOR floorNormal = VGet(0, 1, 0);
 
+	// ==============================
+	// 床・天井判定（縦方向処理）
+	// ==============================
 	for (auto obj : stageList)
 	{
 		Stage* pStage = dynamic_cast<Stage*>(obj);
 		if (!pStage) continue;
 
 		// ------------------------------
-		// 床判定
+		// 床判定（複数点レイで一番高い床を採用）
 		// ------------------------------
 		for (const auto& offset : kOffsets)
 		{
@@ -164,19 +167,33 @@ void Character3D::ResolveCollision3D()
 
 			VECTOR hitPos = pStage->CheckHit_Line(start, end);
 
-			DrawLine3D(start, end, GetColor(255, 0, 0));
+			DrawLine3D(start, end, GetColor(255, 0, 0)); // デバッグ表示
 
+			// ヒット位置が有効なら
 			if (VSize(hitPos) > 0.0001f)
 			{
+				// ラインと床が交差した = 足元に床が存在する
 				isHitFloor = true;
 
+				// 複数ヒットした中で一番高い床を採用する
+				// （段差や坂で低い床を拾って沈み込むのを防ぐ）
 				if (hitPos.y > bestFloorY)
+				{
 					bestFloorY = hitPos.y;
+
+					// 採用した床地点の法線を取得
+					// → 傾きに応じたキャラの姿勢補正や坂滑り計算に使用
+					VECTOR tmpNormal;
+					if (pStage->CheckHit_Line_Normal(start, end, tmpNormal))
+					{
+						floorNormal = tmpNormal;
+					}
+				}
 			}
 		}
 
 		// ------------------------------
-		// 天井判定
+		// 天井判定（カプセル + レイ）
 		// ------------------------------
 		if (pStage->CheckHit_Capsule(
 			VAdd(mvPosition, VGet(0, m_ceilCapsuleMinY, 0)),
@@ -214,7 +231,8 @@ void Character3D::ResolveCollision3D()
 		bool isGrounded = false;
 		if (m_team == Team::Player)
 		{
-			if (mfYVelocity <= 0 && footY <= bestFloorY + 1.0f) isGrounded = true;
+			// 落下しているかつ足元が床に近いときのみ接地させる
+			if (mfYVelocity <= 0 && footY <= bestFloorY + 10.0f) isGrounded = true;
 		}
 		else
 		{

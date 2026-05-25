@@ -22,6 +22,7 @@ public:
 	void MoveEx();
 	void RotationByMove();
 	void Jump();
+	void DrawHp(); // HPの画像の描画
 
 	// Player3D 固有のショットなど
 	void Shot();
@@ -46,4 +47,9 @@ private:
 	// 連射を制限するためのタイマー用変数
 	float mfShotTimer = 0.0f;// 弾を撃つ間隔(フレーム数)   10.0f なら 10フレームに1発
 	static constexpr float SHOT_INTERVAL = 20.0f;
+
+	// HP画像ハンドル
+	int mnHeartFullImg; // ライフのハンドル
+	int mnHeartEmptyImg; // 失ったHPのハンドル
+	int mnHpBox; // HPの背景ボックスのハンドル
 };

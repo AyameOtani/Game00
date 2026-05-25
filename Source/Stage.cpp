@@ -81,11 +81,14 @@ void Stage::Update()
 		break;
 
 	case StageType::Moving:
-		mvPosition.y = sinf(mfMoveTime) * 300.0f;
+		mvPosition.y = sinf(mfMoveTime) * 500.0f;
 		break;
 
 	case StageType::Rotating:
-		// 今はTitleRotateでやってるので何もしなくてOKでもいい
+		mfMoveTime += 0.016f;
+		// 左右にグラグラ揺れる（Z軸で傾く）
+		float tilt = sinf(mfMoveTime * 0.7f) * 0.8f; // 振れ幅（0.8fは約46度くらい）
+		mvRotation.z = tilt;
 		break;
 	}
 

@@ -13,7 +13,7 @@
 
 // コンストラクタ：Character3D の判定パラメータはここで調整する
 Player3D::Player3D(VECTOR initPos, std::string filename)
-	: Character3D(initPos, 50, Team::Player, 30.0f) // maxHp, team, radius
+	: Character3D(initPos, 5, Team::Player, 30.0f) // maxHp, team, radius
 	, mfAngle(0.0f)
 	, mfTargetAngle(0.0f)
 {
@@ -21,23 +21,29 @@ Player3D::Player3D(VECTOR initPos, std::string filename)
 	SetTag(Tag3D::T_Player3D);
 
 	// Player 固有の当たり判定パラメータ調整（Character3D の protected メンバへ代入）
-	m_radius = 30.0f;
-	m_ceilRadius = 45.0f; // 天井判定用半径
 
-	m_floorCapsuleMinY = 3.0f;
-	m_floorCapsuleMaxY = 40.0f;
-	m_floorLinePos = 26.0f;
-	m_floorLineMinY = 80.0f;
-	m_floorLineMaxY = -100.0f;
+	m_radius = 30.0f;             // プレイヤー本体の当たり判定半径
+	m_ceilRadius = 45.0f;         // 天井判定用の半径
 
-	m_wallCapsuleMinY = 40.0f;
-	m_wallCapsuleMaxY = 50.0f;
+	m_floorCapsuleMinY = 3.0f;    // 床判定カプセルの下端Y座標
+	m_floorCapsuleMaxY = 40.0f;   // 床判定カプセルの上端Y座標
+	m_floorLinePos = 26.0f;       // 床判定ラインの基準位置
+	m_floorLineMinY = 80.0f;      // 床判定ラインの開始位置
+	m_floorLineMaxY = -100.0f;    // 床判定ラインの終了位置（下方向）
 
-	m_ceilCapsuleMinY = 50.0f;
-	m_ceilCapsuleMaxY = 60.0f;
-	m_ceilLinePos = 30.0f;
-	m_ceilLineMinY = 70.0f;
-	m_ceilLineMaxY = 100.0f;
+	m_wallCapsuleMinY = 40.0f;    // 壁判定カプセルの下端Y座標
+	m_wallCapsuleMaxY = 50.0f;    // 壁判定カプセルの上端Y座標
+
+	m_ceilCapsuleMinY = 50.0f;    // 天井判定カプセルの下端Y座標
+	m_ceilCapsuleMaxY = 60.0f;    // 天井判定カプセルの上端Y座標
+	m_ceilLinePos = 30.0f;        // 天井判定ラインの基準位置
+	m_ceilLineMinY = 70.0f;       // 天井判定ラインの開始位置
+	m_ceilLineMaxY = 100.0f;      // 天井判定ラインの終了位置（上方向）
+
+	// 画像の読み込み
+	mnHeartFullImg = LoadGraph("Resource/2D/Life.png"); if (mnHeartFullImg == -1) printfDx("画像ない");
+	mnHeartEmptyImg = LoadGraph("Resource/2D/Damage.png"); if (mnHeartEmptyImg == -1) printfDx("画像ない");
+	mnHpBox = LoadGraph("Resource/2D/HpBox.png"); if (mnHpBox == -1) printfDx("画像ない");
 
 	SetFontSize(20);
 }
@@ -82,6 +88,8 @@ void Player3D::Draw()
 	// ここで共通デバッグ描画を呼ぶ（Character3D::DebugDraw）
 	DebugDraw();
 
+	DrawHp(); // HPの描画呼び出し
+
 	// HP 表示など Player 固有の情報
 	DrawFormatString(0, 40, GetColor(255,255,0), "HP: %d", m_hp);
 	DrawFormatString(0, 10, GetColor(255,255,0), "%.1f, %.1f, %.1f", mvPosition.x, mvPosition.y, mvPosition.z);
@@ -89,6 +97,29 @@ void Player3D::Draw()
 
 	if (mpModel) mpModel->Draw();
 	Object3D::Draw();
+}
+
+void Player3D::DrawHp()
+{
+	int boxX = 250;
+	int boxY = 900;
+	// HPの背景ボックスの表示
+	DrawRotaGraph(boxX, boxY, 0.4f, 0.0f, mnHpBox, TRUE);
+	// ハートの表示
+	for (int i = 0; i < m_maxHp; i++)
+	{
+		int x = 190 + i * 50;
+
+		if (i < m_hp)
+		{
+			DrawRotaGraph(x, boxY, 0.25f, 0.0f, mnHeartFullImg, TRUE);
+		}
+		else
+		{
+			DrawRotaGraph(x, boxY, 0.25f, 0.0f, mnHeartEmptyImg, TRUE);
+		}
+	}
+
 }
 
 void Player3D::Shot()

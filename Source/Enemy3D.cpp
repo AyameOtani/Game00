@@ -12,7 +12,7 @@ int Enemy3D::s_nextEnemyID = 0;
 
 // コンストラクタ
 Enemy3D::Enemy3D(VECTOR initPos, std::string filename, EnemyType type)
-	: Character3D(initPos, 20, Team::Enemy, 60.0f)
+	: Character3D(initPos, 2, Team::Enemy, 60.0f)
 	, m_type(type)
 	, mfAngle(0.0f)
 	, mfTargetAngle(0.0f)
@@ -33,8 +33,8 @@ Enemy3D::Enemy3D(VECTOR initPos, std::string filename, EnemyType type)
 	m_floorCapsuleMinY = 3.0f;
 	m_floorCapsuleMaxY = 40.0f;
 	m_floorLinePos = 30.0f;
-	m_floorLineMinY = 20.0f;
-	m_floorLineMaxY = -300.0f;
+	m_floorLineMinY = 60.0f;
+	m_floorLineMaxY = -100.0f;
 
 	// 壁判定
 	m_wallCapsuleMinY = 40.0f;

@@ -240,7 +240,7 @@ void Bullet3D::HitCharacter()
             // ==============================
             if (hit)
             {
-                pChar->TakeDamage(10);
+                pChar->TakeDamage(1);
                 SetDeleteFlag(true);
                 return;
             }
