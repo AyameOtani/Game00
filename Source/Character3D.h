@@ -77,7 +77,7 @@ protected:
 	bool mbIsGround = false;
 	bool mbJump = false;
 	bool mbFall = false;
-	float mfGroundY = 0.0f;
+	float mfGroundY = -FLT_MAX;
 
 	// 向き・運動パラメータ
 	float mfAngle = 0.0f;

@@ -2,11 +2,13 @@
 #include "Model.h"
 #include "Master.h"
 
-Stage::Stage(std::string stageModelName, std::string stageCollisionModelName)
+Stage::Stage(std::string stageModelName, std::string stageCollisionModelName
+	, StageType type)
 	: Object3D(VGet(0.0f, 0.0f, 0.0f)) // 座標は原点としておく
 	, mnModelHandle(-1)
 	, mnCollisionHandle(-1)
 	, mfMoveTime(0.0f)
+	, m_type(type)
 {
 	// タグ設定
 	SetTag(Object3D::T_Stage3D);
@@ -58,10 +60,8 @@ void Stage::SetScale(float scale)
 
 Stage::~Stage()
 {
-	// 読み込んだモデルの破棄
-	// ぉーディングでやるからいらぬ
-	// MV1DeleteModel(mnModelHandle);
-	// MV1DeleteModel(mnCollisionHandle);
+	 MV1DeleteModel(mnModelHandle);
+	 MV1DeleteModel(mnCollisionHandle);
 }
 
 void Stage::Update()
@@ -74,7 +74,20 @@ void Stage::Update()
 
 	// 上下移動
 	//mvPosition.y = sinf(mfMoveTime) * 100.0f;
+	switch (m_type)
+	{
+	case StageType::Static:
+		// 動かさない
+		break;
 
+	case StageType::Moving:
+		mvPosition.y = sinf(mfMoveTime) * 300.0f;
+		break;
+
+	case StageType::Rotating:
+		// 今はTitleRotateでやってるので何もしなくてOKでもいい
+		break;
+	}
 
 	// モデル位置
 	MV1SetPosition(mnModelHandle, mvPosition);

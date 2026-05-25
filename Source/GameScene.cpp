@@ -54,7 +54,9 @@ void GameScene::Initialize()
 	}
 
 	Stage* stage = new Stage ("Resource/3D/Stage1/stage.mqo", "Resource/3D/Stage1/stage.mqo");
+	Stage* moveStage = new Stage ("Resource/3D/Stage1/moveStage.mqo", "Resource/3D/Stage1/moveStage.mqo", Stage::StageType::Moving);
 	stage->SetScale(2.3f);
+	moveStage->SetScale(2.3f);
 
 	Master::mpCamera->Reset();
 }

@@ -8,7 +8,16 @@ class Stage : public Object3D
 {
 
 public:
-	 Stage(std::string stageModelName, std::string stageCollisionModelName);
+	// ステージの種類
+	enum class StageType
+	{
+		Static,    // 動かない
+		Moving,    // 平行移動する
+		Rotating   // 回転する
+	};
+
+public:
+	 Stage(std::string stageModelName, std::string stageCollisionModelName, StageType type = StageType::Static);
 	//Stage(int modelhandel, int collisionHandle);
 
 	~Stage();
@@ -40,11 +49,15 @@ public:
 	void SetScale(float scale);
 
 private:
+
+	StageType m_type; // ステージのタイプ
+
 	int mnModelHandle;     // ステージモデルのハンドル
 	int mnCollisionHandle; // ステージのコリジョンモデルのハンドル
 	float mfRotation; // タイトルで回転したい
 	bool mbRota; // 回転をするかのフラグ
 
 	float mfMoveTime;
+
 
 };

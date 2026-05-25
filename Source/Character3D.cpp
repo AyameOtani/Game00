@@ -149,16 +149,13 @@ void Character3D::ResolveCollision3D()
 
 	VECTOR floorNormal = VGet(0, 1, 0);
 
-	// ==============================
-	// 床・天井判定（縦方向処理）
-	// ==============================
 	for (auto obj : stageList)
 	{
 		Stage* pStage = dynamic_cast<Stage*>(obj);
 		if (!pStage) continue;
 
 		// ------------------------------
-		// 床判定（複数点レイで一番高い床を採用）
+		// 床判定
 		// ------------------------------
 		for (const auto& offset : kOffsets)
 		{
@@ -167,28 +164,19 @@ void Character3D::ResolveCollision3D()
 
 			VECTOR hitPos = pStage->CheckHit_Line(start, end);
 
-			DrawLine3D(start, end, GetColor(255, 0, 0)); // デバッグ表示
+			DrawLine3D(start, end, GetColor(255, 0, 0));
 
 			if (VSize(hitPos) > 0.0001f)
 			{
 				isHitFloor = true;
 
 				if (hitPos.y > bestFloorY)
-				{
 					bestFloorY = hitPos.y;
-
-					// 床の傾きを取得（可能な場合）
-					VECTOR tmpNormal;
-					if (pStage->CheckHit_Line_Normal(start, end, tmpNormal))
-					{
-						floorNormal = tmpNormal;
-					}
-				}
 			}
 		}
 
 		// ------------------------------
-		// 天井判定（カプセル + レイ）
+		// 天井判定
 		// ------------------------------
 		if (pStage->CheckHit_Capsule(
 			VAdd(mvPosition, VGet(0, m_ceilCapsuleMinY, 0)),
