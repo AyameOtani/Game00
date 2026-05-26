@@ -30,6 +30,8 @@ public:
 	void SetupShake(float time, float width, float angleSpeed, float stepTime = 1.0f);
 	VECTOR GetShakePosition() { return mvShakePosition; } // 揺れのゲッター
 
+	void SetTarget(Object3D* target) { mpTarget = target; } // ターゲット設定
+
 
 private:
 	float mfHorizontalAngle;  // 水平方向アングル  ここでもカメラの座標が変わる（縦座標はそのまま）

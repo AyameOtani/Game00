@@ -74,55 +74,52 @@ void GameScene::Update()
 		Master::mpSceneManager->SetNextScene(SceneManager::SCENE_TYPE::WIN_RESULT_3D);
 	}
 
-	// --- 安全対策 ---
-	// ObjectManager から直接返されるリストは将来フレーム中に変わり得る（削除など）。
-	// そのためローカルコピー（スナップショット）を作ることで、以降の処理で不整合を防ぐ。
-	auto rawPlayerList =
+	auto pPlayerList =
 		Master::mpSceneManager->GetCurrentScene()
 		->GetObjectManager()->GetObject3DListByTag(Object3D::T_Player3D);
 
-	// プレイヤーの勝利判定
-	for (auto* obj : rawPlayerList)
+
+	// プレイヤーが生きているかのフラグ
+	bool isPlayerAlive = false;
+
+	// プレイヤー一覧を走査して「生存判定」と「勝敗条件」をチェックする
+	for (auto* obj : pPlayerList)
 	{
-		// Player3D にキャストして位置を取得
 		Player3D* player = dynamic_cast<Player3D*>(obj);
-		// 弁当箱の位置だったら
-		if (player && player->GetPosition().z > 15500.0f && player->GetPosition().y > 500)
+		if (!player) continue;
+
+		// HP管理クラスとして扱えるか確認
+		//Character3D* ch = dynamic_cast<Character3D*>(player);
+
+		// HPがある & 削除フラグが立っていない＝生存中
+		if (player && !player->IsDeleteFlag())
 		{
-			Master::mpSceneManager->SetNextScene(SceneManager::SCENE_TYPE::WIN_RESULT_3D);
-			return; // 遷移予約したら早期リターン
+			isPlayerAlive = true;
+
+			// 勝利条件チェック
+			if (player->GetPosition().z > 15500.0f &&
+				player->GetPosition().y > 500)
+			{
+				Master::mpSceneManager->SetNextScene(SceneManager::SCENE_TYPE::WIN_RESULT_3D);
+				return;
+			}
+
+			// 敗北条件チェック（落下）
+			if (player->GetPosition().y < -3000.0f)
+			{
+				Master::mpSceneManager->SetNextScene(SceneManager::SCENE_TYPE::LOSE_RESULT_3D);
+				return;
+			}
 		}
 	}
 
-
-	// スナップショットを作成
-	std::vector<Object3D*> players = rawPlayerList;
-
-	bool playersEmpty = players.empty();
-
-	// 両方空 or いずれか空 の場合、安全に一度だけシーン切替を予約して早期リターン
-	if (playersEmpty)
+	// プレイヤーが1人も生存していない場合は敗北
+	if (!isPlayerAlive)
 	{
-		// 優先度 プレイヤーが居なければLOSE、それ以外は敵が居なければWIN
-		if (playersEmpty)
-		{
-			Master::mpSceneManager->SetNextScene(SceneManager::SCENE_TYPE::LOSE_RESULT_3D);
-		}
-		else
-		{
-			// 敵が居ない、または両方居ない場合は勝利シーンに遷移（要件で変更可）
-			Master::mpSceneManager->SetNextScene(SceneManager::SCENE_TYPE::WIN_RESULT_3D);
-		}
-
-		// 早期 return して以降で削除済みオブジェクトへ触らないようにする
+		Master::mpSceneManager->SetNextScene(SceneManager::SCENE_TYPE::LOSE_RESULT_3D);
 		return;
 	}
 
-
-	// ここ以降は players, enemies を使って参照・処理する（オブジェクトはまだ存在する想定）
-	// 例：生存チェックなど
-	// SaveEnemyDataToFile は内部で m_enemyList 等を参照するなら安全な実装へ変更してください
-	SaveEnemyDataToFile();
 
 	// 基底クラスの更新処理（Scene::Update は内部で ObjectManager を Update/Draw する想定）
 	Scene::Update();
@@ -135,7 +132,11 @@ void GameScene::Draw()
 
 void GameScene::Finalize()
 {
-
+	// 次のシーンへ行く前にカメラを強制的にリセットする
+	if (Master::mpCamera)
+	{
+		Master::mpCamera->Reset();
+	}
 }
 
 void GameScene::SaveEnemyDataToFile()

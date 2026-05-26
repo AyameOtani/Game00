@@ -46,6 +46,10 @@ void LoseResultScene::Update()
 
 void LoseResultScene::Draw()
 {
+	// ２D用に設定
+	SetUseZBufferFlag(FALSE);
+	SetWriteZBufferFlag(FALSE);
+
 	// 背景の描画
 	DrawGraph(0, 0, mnBagHandle, TRUE);
 
@@ -57,6 +61,9 @@ void LoseResultScene::Draw()
 
 	DrawFormatString(750, 880, GetColor(255, 255, 255), "EnterでTITLE");
 
+	// ２D用に設定
+	SetUseZBufferFlag(TRUE);
+	SetWriteZBufferFlag(TRUE);
 
 	// 基底クラスの更新処理を呼びだす
 	Scene::Draw();

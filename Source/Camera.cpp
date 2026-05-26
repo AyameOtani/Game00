@@ -4,6 +4,7 @@
 #include "InputManager.h"
 #include "SceneManager.h"
 #include "Scene.h"
+#include "Object3D.h"
 #include <cmath> // cosなどを使うためのインクルード
 
 Camera::Camera()
@@ -39,23 +40,32 @@ void Camera::Initialize()
 void Camera::Update()
 {
 	// カメラの向く対象の処理
+	// ターゲットが削除済みなら一度クリアする
+	if (mpTarget != nullptr)
+	{
+		if (mpTarget->IsDeleteFlag())
+		{
+			mpTarget = nullptr;
+		}
+	}
+
 	if (mpTarget == nullptr)
 	{
-		// プレイヤーのオブジェクトを探し出している
+		// ターゲットが存在しない場合はプレイヤーを探して設定する
 		mpTarget = Master::mpSceneManager->GetCurrentScene()
 			->GetObjectManager()->GetObject3DByTag(Object3D::T_Player3D);
 	}
 
-	if (mpTarget != nullptr) // ターゲットがいなかったら
+	if (mpTarget != nullptr)
 	{
-		// 基準座標を対象の座標にする
-		mvLookAtPosition = mpTarget->GetPosition(); // ターゲットからポジションをとってくる
+		// ターゲットに追従するように注視位置を更新する
+		mvLookAtPosition = mpTarget->GetPosition();
 		mvLookAtPosition.y += 110.0f;
 	}
 	else
 	{
-		// 注視点を少し上にずらす
-		mvLookAtPosition.y = 110.0f;
+		// ターゲットが存在しない場合は何もしない
+		// （mvLookAtPositionを更新しないことで、シーン切り替え時などの急なカメラ移動を防ぐ）
 	}
 
 	//この中で処理は完結する　分かりやすいように
