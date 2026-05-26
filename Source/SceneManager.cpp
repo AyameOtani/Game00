@@ -25,7 +25,7 @@ void SceneManager::Initialize()
 	/*mnNextSceneType = SCENE_TYPE::SCENE_3D;*/
 
 	// 初期シーンの変更　　シーンの追加
-	mnNextSceneType = SCENE_TYPE::SCENE_3D;
+	mnNextSceneType = SCENE_TYPE::TITLE_3D;
 	//mnNextSceneType = SCENE_TYPE::SELECT_SCENE_3D;
 
 

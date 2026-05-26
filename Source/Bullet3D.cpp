@@ -81,7 +81,7 @@ void Bullet3D::Draw()
         mpModel->Draw();
     }
 
-    DrawSphere3D(mvPosition, m_radius, 8, GetColor(255, 255, 0), GetColor(255, 255, 0), false);
+    //DrawSphere3D(mvPosition, m_radius, 8, GetColor(255, 255, 0), GetColor(255, 255, 0), false);
 
     Object3D::Draw();
 }

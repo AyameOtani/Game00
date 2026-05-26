@@ -25,6 +25,8 @@ GameScene::~GameScene()
 
 void GameScene::Initialize()
 {
+	Master::mpCamera->Reset();
+
 	SkyBox* pSkyBox = new SkyBox("Resource/3D/SkyBox/sky.mqo");
 	pSkyBox->SetScale(10.0f);  // 最大で9.0ぐらい？ 1222
 
@@ -62,8 +64,6 @@ void GameScene::Initialize()
 	moveStage->SetScale(scale);
 	rotaStage->SetScale(scale);
 	littleRotaStage->SetScale(scale);
-
-	Master::mpCamera->Reset();
 }
 
 void GameScene::Update()

@@ -31,6 +31,10 @@ public:
 	// モデル同期（Character3D::SyncModel を実装）
 	void SyncModel() override;
 
+public:
+	void OnDeath();            // 死亡時に呼ぶ
+	bool IsMarkedForDelete() const { return mbMarkedForDelete; }
+
 private:
 	Model* mpModel = nullptr;
 
@@ -53,4 +57,6 @@ private:
 	int mnHeartFullImg; // ライフのハンドル
 	int mnHeartEmptyImg; // 失ったHPのハンドル
 	int mnHpBox; // HPの背景ボックスのハンドル
+
+	bool mbMarkedForDelete = false; // OnDeathで立てる（本当に削除するのはObjectManager任せ）
 };

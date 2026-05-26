@@ -56,7 +56,7 @@ Player3D::~Player3D()
 void Player3D::Update()
 {
 	// 落下したときは削除
-	if (mvPosition.y < -4000.0f) SetDeleteFlag(true);
+	if (mvPosition.y < -3000.0f) SetDeleteFlag(true);
 
 	if (CheckHitKey(KEY_INPUT_1))
 	{
