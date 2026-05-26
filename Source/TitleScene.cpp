@@ -3,6 +3,8 @@
 #include "DxLib.h"
 #include "Master.h"
 #include "inputManager.h"
+#include "Stage.h"
+#include "SkyBox.h"
 
 TitleScene::TitleScene()
 	: Scene()     // 基底クラスのコンストラクタを呼び出しておく
@@ -17,7 +19,17 @@ TitleScene::TitleScene()
 
 	mnBoxHandle = LoadGraph("Resource/2D/TitleBox.png");
 	if (mnBoxHandle == -1) printfDx("画像ない");
+
+
+	// 文字作成
+	mnTitleFontHandle = CreateFontToHandle(
+		NULL,
+		100,
+		5
+	);
 }
+
+
 
 TitleScene::~TitleScene()
 {
@@ -28,6 +40,13 @@ void TitleScene::Initialize()
 {
 	// ここでカメラを元の位置に戻している
 	Master::mpCamera->Reset();
+	Master::mpCamera->SetTitleMode(true);
+
+
+	Stage* stage = new Stage("Resource/3D/Stage1/TitleStage.mqo", "Resource/3D/Stage1/TitleStage.mqo");
+	SkyBox* pSkyBox = new SkyBox("Resource/3D/SkyBox/sky.mqo");
+	pSkyBox->SetScale(10.0f);  // 最大で9.0ぐらい？ 1222
+
 }
 
 
@@ -45,23 +64,43 @@ void TitleScene::Update()
 
 void TitleScene::Draw()
 {
-	// 背景の描画
-	DrawGraph(0, 0, mnBagHandle, TRUE);
-
-	// 文字の背景
-	DrawRotaGraph(Utility::SCREEN_WIDTH / 2, 910, 0.6f, 0.0f, mnBoxHandle, TRUE);
-
-	// ロゴの描画
-	DrawRotaGraph(Utility::SCREEN_WIDTH / 2, Utility::SCREEN_HEIGHT / 2 - 110, 0.85f, 0.0f, mnRogoHandle, TRUE);
-
-	DrawFormatString(750, 880, GetColor(255, 255, 255), "EnterでSTART");
 
 	// 基底クラスの更新処理を呼びだす
 	Scene::Draw();
+
+	// 2D用に設定
+	SetUseZBufferFlag(FALSE);
+	SetWriteZBufferFlag(FALSE);
+
+	const char* text = "たこさんウインナーは弁当箱に帰りたい";
+
+	int width = GetDrawStringWidthToHandle(
+		text,
+		strlen(text),
+		mnTitleFontHandle
+	);
+
+	// 中央を500に合わせる
+	int x = (Utility::SCREEN_WIDTH - width) / 2;
+
+	DrawFormatStringToHandle(
+		x, 400,
+		GetColor(255, 255, 255),
+		mnTitleFontHandle,
+		text
+	);
+
+	DrawFormatString(750, 880, GetColor(255, 255, 255), "EnterでSTART");
+
+	// 3D用に設定
+	SetUseZBufferFlag(TRUE);
+	SetWriteZBufferFlag(TRUE);
+
 }
 
 
 void TitleScene::Finalize()
 {
-
+	// フォントハンドルの削除
+	DeleteFontToHandle(mnTitleFontHandle);
 }

@@ -2,13 +2,13 @@ Metasequoia Document
 Format Text Ver 1.0
 
 Scene {
-	pos 2627.3159 -2101.0698 62500.0000
+	pos 6115.9761 -2929.1863 3725.2903
 	lookat 0.0000 0.0000 0.0000
 	head -199.8948
 	pich 1.3808
 	bank -6.3100
 	ortho 0
-	zoom2 0.1200
+	zoom2 2.0131
 	amb 0.250 0.250 0.250
 	dirlights 1 {
 		light {
@@ -39,7 +39,7 @@ Object "1" {
 	rotation 0.000000 0.000000 0.000000
 	translation 0.000000 0.000000 0.000000
 	visible 15
-	locking 1
+	locking 0
 	shading 1
 	facet 59.5
 	color 0.898 0.498 0.698
@@ -94,7 +94,7 @@ Object "2" {
 	rotation 0.000000 -0.000000 0.000000
 	translation 0.000000 0.000000 0.000000
 	visible 15
-	locking 1
+	locking 0
 	shading 1
 	facet 59.5
 	color 0.898 0.498 0.698
@@ -139,7 +139,7 @@ Object "4" {
 	rotation 0.000000 0.000000 0.000000
 	translation 0.000000 0.000000 0.000000
 	visible 15
-	locking 1
+	locking 0
 	shading 1
 	facet 59.5
 	color 0.898 0.498 0.698
@@ -156,7 +156,7 @@ Object "6" {
 	rotation 0.000000 -0.000000 0.000000
 	translation 0.000000 0.000000 0.000000
 	visible 15
-	locking 1
+	locking 0
 	shading 1
 	facet 59.5
 	color 0.898 0.498 0.698
@@ -173,7 +173,7 @@ Object "7" {
 	rotation 0.000000 -0.000000 0.000000
 	translation 0.000000 0.000000 0.000000
 	visible 15
-	locking 1
+	locking 0
 	shading 1
 	facet 59.5
 	color 0.898 0.498 0.698
@@ -204,7 +204,7 @@ Object "8" {
 	rotation 0.000000 -0.000000 0.000000
 	translation 0.000000 0.000000 0.000000
 	visible 15
-	locking 1
+	locking 0
 	shading 1
 	facet 59.5
 	color 0.898 0.498 0.698
@@ -221,7 +221,7 @@ Object "9" {
 	rotation 0.000000 -0.000000 0.000000
 	translation 0.000000 0.000000 0.000000
 	visible 15
-	locking 1
+	locking 0
 	shading 1
 	facet 59.5
 	color 0.898 0.498 0.698
@@ -252,7 +252,7 @@ Object "obj1" {
 	rotation 0.000000 0.000000 0.000000
 	translation 0.000000 0.000000 0.000000
 	visible 15
-	locking 1
+	locking 0
 	shading 1
 	facet 59.5
 	color 0.898 0.498 0.698
@@ -411,7 +411,7 @@ Object "obj2" {
 	rotation 0.000000 0.000000 0.000000
 	translation 0.000000 0.000000 0.000000
 	visible 15
-	locking 1
+	locking 0
 	shading 1
 	facet 59.5
 	color 0.898 0.498 0.698
@@ -676,7 +676,7 @@ Object "obj3" {
 	rotation 0.000000 0.000000 0.000000
 	translation 0.000000 0.000000 0.000000
 	visible 15
-	locking 1
+	locking 0
 	shading 1
 	facet 59.5
 	color 0.898 0.498 0.698
@@ -925,7 +925,7 @@ Object "obj4" {
 	rotation 0.000000 0.000000 0.000000
 	translation 0.000000 0.000000 0.000000
 	visible 15
-	locking 1
+	locking 0
 	shading 1
 	facet 59.5
 	color 0.898 0.498 0.698
@@ -1230,7 +1230,7 @@ Object "obj5" {
 	rotation 0.000000 0.000000 0.000000
 	translation 0.000000 0.000000 0.000000
 	visible 15
-	locking 1
+	locking 0
 	shading 1
 	facet 59.5
 	color 0.898 0.498 0.698

@@ -11,7 +11,7 @@
 int Enemy3D::s_nextEnemyID = 0;
 
 // コンストラクタ
-Enemy3D::Enemy3D(VECTOR initPos, std::string filename, EnemyType type)
+Enemy3D::Enemy3D(VECTOR initPos, EnemyType type)
 	: Character3D(initPos, 2, Team::Enemy, 60.0f)
 	, m_type(type)
 	, mfAngle(0.0f)
@@ -21,6 +21,8 @@ Enemy3D::Enemy3D(VECTOR initPos, std::string filename, EnemyType type)
 {
 	SetTag(Object3D::T_Enemy3D);
 
+	// 敵のパスを読み込む
+	std::string filename = GetModelPath(type);
 	// モデル生成
 	mpModel = new Model(filename, initPos);
 
@@ -52,6 +54,26 @@ Enemy3D::Enemy3D(VECTOR initPos, std::string filename, EnemyType type)
 
 	SetFontSize(20);
 }
+
+std::string Enemy3D::GetModelPath(Enemy3D::EnemyType type)
+{
+	switch (type)
+	{
+	case Attacker:
+		return "Resource/3D/Enemy/broccoli.mqo";
+
+	case Jumper:
+		return "Resource/3D/Enemy/tomato.mqo";
+
+	case Runner:
+		return "Resource/3D/Enemy/Tank.mqo";
+
+	default:
+		return "Resource/3D/Enemy/Default.mqo";
+	}
+}
+
+
 
 // デストラクタ
 Enemy3D::~Enemy3D()

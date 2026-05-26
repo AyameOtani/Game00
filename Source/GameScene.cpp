@@ -23,9 +23,26 @@ GameScene::~GameScene()
 
 }
 
+Enemy3D::EnemyType GameScene::GetEnemyTypeFromID(int id)
+{
+	if (id >= 0 && id <= 4)
+	{
+		return Enemy3D::Attacker;
+	}
+	else if (id <= 7)
+	{
+		return Enemy3D::Jumper;
+	}
+	else
+	{
+		return Enemy3D::Attacker;
+	}
+}
+
 void GameScene::Initialize()
 {
 	Master::mpCamera->Reset();
+	Master::mpCamera->SetTitleMode(false); // タイトルモードを解除
 
 	SkyBox* pSkyBox = new SkyBox("Resource/3D/SkyBox/sky.mqo");
 	pSkyBox->SetScale(10.0f);  // 最大で9.0ぐらい？ 1222
@@ -50,7 +67,9 @@ void GameScene::Initialize()
 	int count = 0;
 	for (const auto& pos : enemyPosList)
 	{
-		Enemy3D* enemy = new Enemy3D(pos, "Resource/3D/Enemy/broccoli.mqo", Enemy3D::EnemyType::Attacker);
+		Enemy3D::EnemyType type = GetEnemyTypeFromID(count);
+
+		Enemy3D* enemy = new Enemy3D(pos, type);
 		enemy->SetID(count++);
 		m_enemyList.push_back(enemy);
 	}
@@ -87,9 +106,6 @@ void GameScene::Update()
 	{
 		Player3D* player = dynamic_cast<Player3D*>(obj);
 		if (!player) continue;
-
-		// HP管理クラスとして扱えるか確認
-		//Character3D* ch = dynamic_cast<Character3D*>(player);
 
 		// HPがある & 削除フラグが立っていない＝生存中
 		if (player && !player->IsDeleteFlag())

@@ -39,58 +39,86 @@ void Camera::Initialize()
 
 void Camera::Update()
 {
-	// カメラの向く対象の処理
-	// ターゲットが削除済みなら一度クリアする
-	if (mpTarget != nullptr)
+	if (mbTitleMode)
 	{
-		if (mpTarget->IsDeleteFlag())
-		{
-			mpTarget = nullptr;
-		}
-	}
+		mfHorizontalAngle += 0.2f;
 
-	if (mpTarget == nullptr)
-	{
-		// ターゲットが存在しない場合はプレイヤーを探して設定する
-		mpTarget = Master::mpSceneManager->GetCurrentScene()
-			->GetObjectManager()->GetObject3DByTag(Object3D::T_Player3D);
-	}
+		// 見下ろし角度
+		mfVerticalAngle = 15.0f;
+		// 中心は完全固定
+		mvLookAtPosition = VGet(0.0f, 0.0f, 0.0f);
 
-	if (mpTarget != nullptr)
-	{
-		// ターゲットに追従するように注視位置を更新する
-		mvLookAtPosition = mpTarget->GetPosition();
-		mvLookAtPosition.y += 110.0f;
+		const float distance = 2800.0f;	   // 距離
+
+		VECTOR temp;
+		temp.x = distance * cosf(mfVerticalAngle / 180.0f * DX_PI_F)
+			* sinf(mfHorizontalAngle / 180.0f * DX_PI_F);
+
+		temp.y = distance * sinf(mfVerticalAngle / 180.0f * DX_PI_F);
+
+		temp.z = -(distance * cosf(mfVerticalAngle / 180.0f * DX_PI_F)
+			* cosf(mfHorizontalAngle / 180.0f * DX_PI_F));
+
+		mvPosition = VAdd(temp, mvLookAtPosition);
+
+
+		SetCameraPositionAndTarget_UpVecY(mvPosition, mvLookAtPosition);
 	}
 	else
 	{
-		// ターゲットが存在しない場合は何もしない
-		// （mvLookAtPositionを更新しないことで、シーン切り替え時などの急なカメラ移動を防ぐ）
-	}
-
-	//この中で処理は完結する　分かりやすいように
-	{
-		VECTOR temp;   // 作業用変数
-
-		// 球面上の座標を求める
-		// ★DX_PI_F は 3.14 と同じ意味
-		// 250.0f は注視点からどれだけ離れているかという意味
-		// 距離は変えないで回転したい
-		const float distance = 500.0f;
-		temp.x = distance * cosf(mfVerticalAngle / 180.0f * DX_PI_F) * sinf(mfHorizontalAngle / 180.0f * DX_PI_F);    // X座標
-		temp.y = distance * sinf(mfVerticalAngle / 180.0f * DX_PI_F);                                                 // Y座標
-		temp.z = -(distance * cosf(mfVerticalAngle / 180.0f * DX_PI_F) * cosf(mfHorizontalAngle / 180.0f * DX_PI_F)); // Z座標
-
+		// カメラの向く対象の処理
+		// ターゲットが削除済みなら一度クリアする
+		if (mpTarget != nullptr)
 		{
-			// 求めた座標と注視点の座標を足した位置がカメラ座標になる
-			mvPosition = VAdd(temp, mvLookAtPosition);
+			if (mpTarget->IsDeleteFlag())
+			{
+				mpTarget = nullptr;
+			}
 		}
 
-		// カメラ設定を反映
-		SetCameraPositionAndTarget_UpVecY(mvPosition, mvLookAtPosition);
-	}
+		if (mpTarget == nullptr)
+		{
+			// ターゲットが存在しない場合はプレイヤーを探して設定する
+			mpTarget = Master::mpSceneManager->GetCurrentScene()
+				->GetObjectManager()->GetObject3DByTag(Object3D::T_Player3D);
+		}
 
-	UpdateRotation();
+		if (mpTarget != nullptr)
+		{
+			// ターゲットに追従するように注視位置を更新する
+			mvLookAtPosition = mpTarget->GetPosition();
+			mvLookAtPosition.y += 110.0f;
+		}
+		else
+		{
+			// ターゲットが存在しない場合は何もしない
+			// （mvLookAtPositionを更新しないことで、シーン切り替え時などの急なカメラ移動を防ぐ）
+		}
+
+		//この中で処理は完結する　分かりやすいように
+		{
+			VECTOR temp;   // 作業用変数
+
+			// 球面上の座標を求める
+			// ★DX_PI_F は 3.14 と同じ意味
+			// 250.0f は注視点からどれだけ離れているかという意味
+			// 距離は変えないで回転したい
+			const float distance = 500.0f;
+			temp.x = distance * cosf(mfVerticalAngle / 180.0f * DX_PI_F) * sinf(mfHorizontalAngle / 180.0f * DX_PI_F);    // X座標
+			temp.y = distance * sinf(mfVerticalAngle / 180.0f * DX_PI_F);                                                 // Y座標
+			temp.z = -(distance * cosf(mfVerticalAngle / 180.0f * DX_PI_F) * cosf(mfHorizontalAngle / 180.0f * DX_PI_F)); // Z座標
+
+			{
+				// 求めた座標と注視点の座標を足した位置がカメラ座標になる
+				mvPosition = VAdd(temp, mvLookAtPosition);
+			}
+
+			// カメラ設定を反映
+			SetCameraPositionAndTarget_UpVecY(mvPosition, mvLookAtPosition);
+		}
+
+		UpdateRotation();
+	}
 
 	//Debug_DrawLockOnFOV(); // 可視化してるやつ
 }

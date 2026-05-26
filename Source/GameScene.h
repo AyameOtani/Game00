@@ -2,9 +2,7 @@
 #include "Scene.h"
 #include <vector>
 #include "DxLib.h"
-
-class Enemy3D;
-
+#include "Enemy3D.h"
 
 struct EnemyData
 {
@@ -27,6 +25,8 @@ public:
 
     void SaveEnemyDataToFile();
 
+    //int GetEnemyTypeFromID(int id);
+    Enemy3D::EnemyType GetEnemyTypeFromID(int id);
 
 private:
     int m_selectedId = 0; // 今操作対象にしている敵のID

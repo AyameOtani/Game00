@@ -21,6 +21,9 @@ private:
     int mnBagHandle; // 背景のハンドル
 	int mnBoxHandle; // 文字の背景のハンドル
 
+    // フォント
+    int mnTitleFontHandle;
+
 };
 
 

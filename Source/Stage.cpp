@@ -255,23 +255,23 @@ bool Stage::CheckHit_Capsule_Wall(VECTOR pos1, VECTOR pos2, float r, VECTOR& hit
 
 void Stage::TitleRotate()
 {
-	if (Master::mpSceneManager->GetCurrentSceneType() == SceneManager::SCENE_TYPE::TITLE_3D)
-	{
-		// 回転するようにした　1210
-		mfRotation += 0.0005f; // ここで回転速度
-		if (mfRotation > DX_TWO_PI_F) // 360を越したら
-		{
-			mfRotation -= DX_TWO_PI_F; // 今の回転角から３６０分引く
-		}
-		mvRotation.y = mfRotation;
-		//MV1SetRotationXYZ(mnModelHandle, mvRotation);v
+	//if (Master::mpSceneManager->GetCurrentSceneType() == SceneManager::SCENE_TYPE::TITLE_3D)
+	//{
+	//	// 回転するようにした　1210
+	//	mfRotation += 0.0005f; // ここで回転速度
+	//	if (mfRotation > DX_TWO_PI_F) // 360を越したら
+	//	{
+	//		mfRotation -= DX_TWO_PI_F; // 今の回転角から３６０分引く
+	//	}
+	//	mvRotation.y = mfRotation;
+	//	//MV1SetRotationXYZ(mnModelHandle, mvRotation);v
 
 
-		// ------フォグ設定 ------
-		SetFogEnable(TRUE);// フォグ有効
-		SetFogStartEnd(000.0f, 15000.0f);// フォグが始まる距離と終了する距離を設定する
-		SetFogColor(255, 200, 180); // 色
-	}
+	//	// ------フォグ設定 ------
+	//	SetFogEnable(TRUE);// フォグ有効
+	//	SetFogStartEnd(000.0f, 15000.0f);// フォグが始まる距離と終了する距離を設定する
+	//	SetFogColor(255, 200, 180); // 色
+	//}
 }
 
 // 線分が当たったらtrueを返し、hitNormalに床の傾きを格納する

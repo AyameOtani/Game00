@@ -46,7 +46,7 @@ void LoseResultScene::Update()
 
 void LoseResultScene::Draw()
 {
-	// ２D用に設定
+	// 2D用に設定
 	SetUseZBufferFlag(FALSE);
 	SetWriteZBufferFlag(FALSE);
 
@@ -61,7 +61,7 @@ void LoseResultScene::Draw()
 
 	DrawFormatString(750, 880, GetColor(255, 255, 255), "EnterでTITLE");
 
-	// ２D用に設定
+	// 3D用に設定
 	SetUseZBufferFlag(TRUE);
 	SetWriteZBufferFlag(TRUE);
 

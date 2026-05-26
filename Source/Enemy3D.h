@@ -16,13 +16,16 @@ public:
 	};
 
 public:
-	Enemy3D(VECTOR initPos, std::string filename, EnemyType type);
+	Enemy3D(VECTOR initPos, EnemyType type);
 	~Enemy3D() override;
 
 	void Update() override;
 	void Draw() override;
 	void DebugDraw(); // デバッグ描画
 	void Shot(); // 発射処理
+
+	// 敵のタイプに応じたモデルのパスを返す関数
+	std::string GetModelPath(Enemy3D::EnemyType type);
 
 	// モデル同期（Character3D のフックを実装）
 	void SyncModel() override;

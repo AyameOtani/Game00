@@ -19,18 +19,27 @@ public:
 
 	VECTOR GetPosition() { return mvPosition; } // 座標の取得
 	VECTOR GetLookAtPosition() { return mvLookAtPosition; }// 注視点取得
+	float GetHorizontalAngle() { return mfHorizontalAngle; } // 水平方向アングルの取得
+
+	void SetPosition(VECTOR pos) { mvPosition = pos; } // 座標の設定
+	void SetLookAtPosition(VECTOR lookAt) { mvLookAtPosition = lookAt; } // 注視点の設定
+	void SetHorizontalAngle(float angle) { mfHorizontalAngle = angle; } // 水平方向アングルの設定
 
 	// カメラが見ている方向を返す
 	float GetHorizonAngle() const { return mfHorizontalAngle; }
 
+	// タイトルモードのゲッターセッター
+	bool GetTitleMode() const { return mbTitleMode; }
+	void SetTitleMode(bool titleMode) { mbTitleMode = titleMode; }
+
 
 	// ★New★
 	// 画面揺れ
-	void Shake();
-	void SetupShake(float time, float width, float angleSpeed, float stepTime = 1.0f);
+	//void Shake();
+	//void SetupShake(float time, float width, float angleSpeed, float stepTime = 1.0f);
 	VECTOR GetShakePosition() { return mvShakePosition; } // 揺れのゲッター
 
-	void SetTarget(Object3D* target) { mpTarget = target; } // ターゲット設定
+	//void SetTarget(Object3D* target) { mpTarget = target; } // ターゲット設定
 
 
 private:
@@ -64,6 +73,9 @@ private:
 	const float MAX_SPEED = 5.0f;     // 最大速度
 	const float ADD_SPEED = 0.32f;   // 加速度
 	const float SUB_SPEED = 0.32f;  // 減速速度
+
+
+	bool mbTitleMode; // タイトルモードか
 };
 
 
