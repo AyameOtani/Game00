@@ -1,33 +1,131 @@
 ﻿#include "Stage.h"
 #include "Model.h"
 #include "Master.h"
+#include "DxLib.h"
 
-Stage::Stage(std::string stageModelName, std::string stageCollisionModelName
-	, StageType type)
-	: Object3D(VGet(0.0f, 0.0f, 0.0f)) // 座標は原点としておく
-	, mnModelHandle(-1)
-	, mnCollisionHandle(-1)
-	, mfMoveTime(0.0f)
+// コンストラクタ（モデルファイル名を指定して生成する場合）
+Stage::Stage(std::string stageModelName, std::string stageCollisionModelName, StageType type)
+	: Object3D(VGet(0.0f, 0.0f, 0.0f))
+	, mnModelHandle(MV1LoadModel(stageModelName.c_str()))
+	, mnCollisionHandle(MV1LoadModel(stageCollisionModelName.c_str()))
 	, m_type(type)
+	, m_ownsModel(true)
+	, m_ownsCollision(true)
+	, mfMoveTime(0.0f)
+	, mfRotation(0.0f)
+	, mbRota(false)
 {
-	// タグ設定
 	SetTag(Object3D::T_Stage3D);
-	
-	// ステージモデルの読み込み
-	mnModelHandle = MV1LoadModel(stageModelName.c_str());
 
-	// コリジョンモデル（当たり判定用のモデル）の読みこみ
-	mnCollisionHandle = MV1LoadModel(stageCollisionModelName.c_str());
-
-	// 当たり判定情報の作成 コリジョンので作ってくれている
-	// 自動的にデータが作成される便利な関数
-	MV1SetupCollInfo(mnCollisionHandle, -1);
+	// 当たり判定情報の構築
+	if (mnCollisionHandle != -1)
+	{
+		MV1SetupCollInfo(mnCollisionHandle, -1);
+	}
 }
 
-// スケール（拡大率）の設定（Modelクラスへの橋渡し）
+// コンストラクタ（外部からハンドルを受け取って生成する場合）
+Stage::Stage(int modelHandle, int collisionHandle, StageType type)
+	: Object3D(VGet(0.0f, 0.0f, 0.0f))
+	, mnModelHandle(modelHandle)
+	, mnCollisionHandle(collisionHandle)
+	, m_type(type)
+	, m_ownsModel(false)       // 外部管理のため削除しない
+	, m_ownsCollision(false)   // 外部管理のため削除しない
+	, mfMoveTime(0.0f)
+	, mfRotation(0.0f)
+	, mbRota(false)
+{
+	SetTag(Object3D::T_Stage3D);
+
+	if (mnCollisionHandle != -1)
+	{
+		MV1SetupCollInfo(mnCollisionHandle, -1);
+	}
+}
+
+// デストラクタ
+Stage::~Stage()
+{
+	// 所有権があるハンドルのみ削除する
+	if (m_ownsModel && mnModelHandle != -1)
+	{
+		MV1DeleteModel(mnModelHandle);
+	}
+	if (m_ownsCollision && mnCollisionHandle != -1)
+	{
+		MV1DeleteModel(mnCollisionHandle);
+	}
+}
+
+// 更新処理
+void Stage::Update()
+{
+	TitleRotate();
+
+	mfMoveTime += 0.016f;
+
+	// ステージのタイプに応じた挙動の切り替え
+	switch (m_type)
+	{
+	case StageType::Static:
+		// 静止状態：一切の移動・回転を行わない
+		break;
+
+	case StageType::Moving:
+		// 上下運動：正弦波（sin）を用いてY軸方向に往復移動させる
+		mvPosition.y = sinf(mfMoveTime) * 300.0f;
+		break;
+
+	case StageType::Rotating:
+		// 大きな揺れ：Z軸に対して比較的大きく左右に傾きを繰り返す
+	{
+		float tilt = sinf(mfMoveTime * 0.7f) * 0.8f;
+		mvRotation.z = tilt;
+	}
+	break;
+
+	case StageType::LittleRotation:
+		// 小さな揺れ：Z軸に対して緩やかに小さく傾きを繰り返す
+	{
+		float little = sinf(mfMoveTime * 0.5f) * 0.4f;
+		mvRotation.z = little;
+	}
+	break;
+
+	default:
+		// 未定義のタイプが指定された場合は静止状態にリセット
+		m_type = StageType::Static;
+		break;
+	}
+
+	// モデル・コリジョンの位置と回転を更新
+	if (mnModelHandle != -1)
+	{
+		MV1SetPosition(mnModelHandle, mvPosition);
+		MV1SetRotationXYZ(mnModelHandle, mvRotation);
+	}
+	if (mnCollisionHandle != -1)
+	{
+		MV1SetPosition(mnCollisionHandle, mvPosition);
+		MV1SetRotationXYZ(mnCollisionHandle, mvRotation);
+		// コリジョン情報を最新の位置・回転に同期
+		MV1RefreshCollInfo(mnCollisionHandle);
+	}
+}
+
+// 描画処理
+void Stage::Draw()
+{
+	if (mnModelHandle != -1)
+	{
+		MV1DrawModel(mnModelHandle);
+	}
+}
+
+// スケール（拡大率）の設定
 void Stage::SetScale(float scale)
 {
-	// モデルと当たり判定用コリジョンモデルの両方に反映させる
 	if (mnModelHandle != -1)
 	{
 		MV1SetScale(mnModelHandle, VGet(scale, scale, scale));
@@ -35,205 +133,71 @@ void Stage::SetScale(float scale)
 	if (mnCollisionHandle != -1)
 	{
 		MV1SetScale(mnCollisionHandle, VGet(scale, scale, scale));
-
-		// 重要：モデルのサイズを変えたら、当たり判定情報も再構築しないとずれる！
+		// スケール変更時は当たり判定情報を再構築する必要がある
 		MV1SetupCollInfo(mnCollisionHandle, -1);
 	}
 }
 
-//Stage::Stage(int modelhandel, int collisionHandle)
-//	: Object3D(VGet(0.0f, 0.0f, 0.0f)) // 座標は原点としておく
-//	, mnModelHandle(modelhandel)
-//	, mnCollisionHandle(collisionHandle)
-//{
-//	// タグ設定
-//	SetTag(Object3D::T_Stage3D);
-//	// 当たり判定情報の作成 ハンドルごとに必要
-//	if (mnCollisionHandle != -1)
-//	{
-//		MV1SetupCollInfo(mnCollisionHandle, -1);
-//	}
-//	// 当たり判定情報の作成 コリジョンので作ってくれている
-//	// 自動的にデータが作成される便利な関数
-//	// MV1SetupCollInfo(mnCollisionHandle, -1);
-//}
-
-Stage::~Stage()
-{
-	 MV1DeleteModel(mnModelHandle);
-	 MV1DeleteModel(mnCollisionHandle);
-}
-
-void Stage::Update()
-{
-
-	TitleRotate();
-
-	// 時間加算
-	mfMoveTime += 0.016f;
-
-	// 上下移動
-	//mvPosition.y = sinf(mfMoveTime) * 100.0f;
-	switch (m_type)
-	{
-	case StageType::Static:
-		// 動かさない
-		break;
-
-	case StageType::Moving:
-		mvPosition.y = sinf(mfMoveTime) * 500.0f;
-		break;
-
-	case StageType::Rotating:
-		{
-			mfMoveTime += 0.016f;
-			// 左右にグラグラ揺れる（Z軸で傾く）
-			float tilt = sinf(mfMoveTime * 0.7f) * 0.8f; // 振れ幅（0.8fは約46度くらい）
-			mvRotation.z = tilt;
-			break;
-		}
-
-	case StageType::LittleRotation:
-		{
-			mfMoveTime += 0.016f;
-			// 左右にグラグラ揺れる（Z軸で傾く）
-			float little = sinf(mfMoveTime * 0.5f) * 0.4f; // 振れ幅（0.4fは約23度くらい）
-			mvRotation.z = little;
-			break;
-		}
-
-	default:
-		m_type = StageType::Static;
-		break;
-	}
-
-	// モデル位置
-	MV1SetPosition(mnModelHandle, mvPosition);
-	// コリジョン位置
-	MV1SetPosition(mnCollisionHandle, mvPosition);
-
-	// 回転
-	MV1SetRotationXYZ(mnModelHandle, mvRotation);
-	MV1SetRotationXYZ(mnCollisionHandle, mvRotation);
-
-	// コリジョン情報更新
-	MV1RefreshCollInfo(mnCollisionHandle);
-
-}
-
-void Stage::Draw()
-{
-	// 描画
-	MV1DrawModel(mnModelHandle);
-
-	// デバッグ表示
-	// MV1DrawModelDebug(mnCollisionHandle, GetColor(255,255,255), 1, 10, 1, 0);
-}
-
-
-// これを、bool,じゃなくて、boolとVECTORを返せるような構造体にする。
-//  boolで当たっていたら、TRUEで、帰ってきたVECTORで何かするとか
-// 今の状況でも、ポジションは取れているから、そこをどうにかする
-//そして、当たっているポジションを引っぱり出せる用にするとか
-
-// 出来なかったら、Rayを４本
-
+// カプセル当たり判定
 bool Stage::CheckHit_Capsule(VECTOR pos1, VECTOR pos2, float r)
 {
-	// 生成していた当たり判定をもとにカプセルとの当たり判定を行う
-	// コリジョン結果代入用ポリゴン配列
+	if (mnCollisionHandle == -1) return false;
+
 	MV1_COLL_RESULT_POLY_DIM result = MV1CollCheck_Capsule(mnCollisionHandle, -1, pos1, pos2, r);
+	bool hit = result.HitNum >= 1;
 
-	// ポリゴンに一つ以上当たっている場合
-	if (result.HitNum >= 1)
+	// デバッグ用描画（ヒットした三角形を表示）
+	if (hit)
 	{
-		// 回数を当たった回数を回す
-		for (int i = 0; i < result.HitNum; i++)
+		for (int i = 0; i < result.HitNum; ++i)
 		{
-			// ３Dの三角形を描画する
-			DrawTriangle3D(
-				result.Dim[i].Position[0],
-				result.Dim[i].Position[1],
-				result.Dim[i].Position[2],
-				GetColor(255, 0, 0),
-				0
-			);
+			DrawTriangle3D(result.Dim[i].Position[0], result.Dim[i].Position[1], result.Dim[i].Position[2], GetColor(255, 0, 0), 0);
 		}
-
 	}
-	// 当たり判定情報の後片付け
 	MV1CollResultPolyDimTerminate(result);
-	return result.HitNum >= 1;
+	return hit;
 }
 
+// 線分当たり判定
 VECTOR Stage::CheckHit_Line(VECTOR pos1, VECTOR pos2)
 {
 	VECTOR ret = VGet(0.0f, 0.0f, 0.0f);
+	if (mnCollisionHandle == -1) return ret;
 
-	// あたり判定情報と線分とのあたり判定を行う
-	//MV1_COLL_RESULT_POLY_DIM result = MV1CollCheck_LineDim(mnCollisionHandle, -1, pos1, pos2); // ★★
 	auto result = MV1CollCheck_Line(mnCollisionHandle, -1, pos1, pos2);
-
-	//// 当たっていた場合   // ★★
-	//if (result.HitNum >= 1)
-	//{
-	//	// 当たった個数のポジションをreturnするように取得する
-	//	// 壁のときみたいにHitPositionをとる必要がない
-	//	ret = result.Dim[0].HitPosition;
-	//}
-
-    // 当たっていた場合
-	if (result.HitFlag >= 1)
-	{
-		// 当たった個数のポジションをreturnするように取得する
-		// 壁のときみたいにHitPositionをとる必要がない
-		ret = result.HitPosition;
-	}
-    // MV1CollCheck_Line の戻り値は明示的な解放関数を必要としないため後片付けは不要
-	//ret = pos2;
+	if (result.HitFlag >= 1) ret = result.HitPosition;
 
 	return ret;
 }
 
-int Stage::GetModelHandle() const
+// 線分の法線付き当たり判定
+bool Stage::CheckHit_Line_Normal(VECTOR pos1, VECTOR pos2, VECTOR& hitNormal)
 {
-	return mnCollisionHandle; // 3Dモデルのハンドルを保存
+	if (mnCollisionHandle == -1) return false;
+
+	auto result = MV1CollCheck_Line(mnCollisionHandle, -1, pos1, pos2);
+	if (result.HitFlag >= 1)
+	{
+		hitNormal = result.Normal;
+		return true;
+	}
+	return false;
 }
 
-
-
-// 壁沿いベクトルの処理 11/4
-// カプセルの両端の座標、半径R、衝突点（戻り値）、衝突法線（戻り値）
+// 壁沿い移動用カプセル当たり判定
 bool Stage::CheckHit_Capsule_Wall(VECTOR pos1, VECTOR pos2, float r, VECTOR& hitPos, VECTOR& hitNormal)
 {
-	// 当たり判定
-	// MV1_COLL_RESULT_POLY_DIM...ポリゴンの情報を格納する構造体
+	if (mnCollisionHandle == -1) return false;
+
 	MV1_COLL_RESULT_POLY_DIM result = MV1CollCheck_Capsule(mnCollisionHandle, -1, pos1, pos2, r);
+	bool isHit = false;
 
-	bool isHit = false; //当たっているかのフラグをfalse
-
-	if (result.HitNum > 0) // ヒットした回数が０以上だったら（当たっていたら）
+	if (result.HitNum > 0)
 	{
-        int nearIndex = 0; // いちばん近いヒット数を入れる変数
-		float nearDistance = FLT_MAX; // 最小距離の保持の為の変数
+		VECTOR avgHitPos = VGet(0, 0, 0);
+		VECTOR avgNormal = VGet(0, 0, 0);
 
-		// Stage.cpp の CheckHit_Capsule_Wall の forループ内
-		for (int i = 0; i < result.HitNum; i++)
-		{
-			DrawTriangle3D(
-				result.Dim[i].Position[0],
-				result.Dim[i].Position[1],
-				result.Dim[i].Position[2],
-				GetColor(255, 0, 0), // 赤色に変えて目立たせてみる
-				false
-			);
-		}
-
-
-		// 衝突点と法線の設定
-		// 複数ポリゴンにヒットしている場合、全ヒットの HitPosition と Normal を平均して返す
-		VECTOR avgHitPos = VGet(0.0f, 0.0f, 0.0f);
-		VECTOR avgNormal = VGet(0.0f, 0.0f, 0.0f);
+		// ヒットした全ポリゴンの情報を平均化する
 		for (int i = 0; i < result.HitNum; ++i)
 		{
 			avgHitPos = VAdd(avgHitPos, result.Dim[i].HitPosition);
@@ -242,50 +206,21 @@ bool Stage::CheckHit_Capsule_Wall(VECTOR pos1, VECTOR pos2, float r, VECTOR& hit
 		avgHitPos = VScale(avgHitPos, 1.0f / (float)result.HitNum);
 		avgNormal = VNorm(avgNormal);
 
-		// 返す値
 		hitPos = avgHitPos;
 		hitNormal = avgNormal;
-
-		isHit = true; // フラグをtrueにしている
+		isHit = true;
 	}
 
-	MV1CollResultPolyDimTerminate(result); // 当たり判定結果ポリゴン配列の後始末をしている
-	return isHit; // 衝突があったかを教えて、＆の所に結果を返している
+	MV1CollResultPolyDimTerminate(result);
+	return isHit;
 }
 
 void Stage::TitleRotate()
 {
-	//if (Master::mpSceneManager->GetCurrentSceneType() == SceneManager::SCENE_TYPE::TITLE_3D)
-	//{
-	//	// 回転するようにした　1210
-	//	mfRotation += 0.0005f; // ここで回転速度
-	//	if (mfRotation > DX_TWO_PI_F) // 360を越したら
-	//	{
-	//		mfRotation -= DX_TWO_PI_F; // 今の回転角から３６０分引く
-	//	}
-	//	mvRotation.y = mfRotation;
-	//	//MV1SetRotationXYZ(mnModelHandle, mvRotation);v
-
-
-	//	// ------フォグ設定 ------
-	//	SetFogEnable(TRUE);// フォグ有効
-	//	SetFogStartEnd(000.0f, 15000.0f);// フォグが始まる距離と終了する距離を設定する
-	//	SetFogColor(255, 200, 180); // 色
-	//}
+	// 必要に応じて実装してください
 }
 
-// 線分が当たったらtrueを返し、hitNormalに床の傾きを格納する
-bool Stage::CheckHit_Line_Normal(VECTOR pos1, VECTOR pos2, VECTOR& hitNormal)
+int Stage::GetModelHandle() const
 {
-	// 一度普通にDxLibの線分判定を呼ぶ
-	auto result = MV1CollCheck_Line(mnCollisionHandle, -1, pos1, pos2);
-
-	// 当たっていたら
-	if (result.HitFlag >= 1)
-	{
-		hitNormal = result.Normal; // 床の法線（向き）を代入
-		return true;
-	}
-
-	return false; // 当たっていなければfalse
+	return mnCollisionHandle;
 }

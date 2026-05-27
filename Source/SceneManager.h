@@ -17,6 +17,7 @@ public: // enum, struct の定義
 		TITLE_3D,  // 3Dのタイトル画面
 		WIN_RESULT_3D, //3Dのリザルト画面WIN
 		LOSE_RESULT_3D, //3Dのリザルト画面LOSE
+		LOADING_3D,	// 追加：ローディングシーン
 	};
 
 

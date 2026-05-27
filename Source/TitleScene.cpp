@@ -5,6 +5,7 @@
 #include "inputManager.h"
 #include "Stage.h"
 #include "SkyBox.h"
+#include "SceneManager.h"
 
 TitleScene::TitleScene()
 	: Scene()     // 基底クラスのコンストラクタを呼び出しておく
@@ -43,6 +44,7 @@ void TitleScene::Initialize()
 	Master::mpCamera->SetTitleMode(true);
 
 
+	// タイトルでは既存のファイル名版を使用する（描画用）
 	Stage* stage = new Stage("Resource/3D/Stage1/TitleStage.mqo", "Resource/3D/Stage1/TitleStage.mqo");
 	SkyBox* pSkyBox = new SkyBox("Resource/3D/SkyBox/sky.mqo");
 	pSkyBox->SetScale(10.0f);  // 最大で9.0ぐらい？ 1222
@@ -55,7 +57,8 @@ void TitleScene::Update()
 {
 	if (InputManager::CheckDownKey(KEY_INPUT_RETURN))
 	{
-		Master::mpSceneManager->SetNextScene(SceneManager::SCENE_TYPE::SCENE_3D);
+		// 直接ゲームに飛ばすのではなくローディングシーンを挟む
+		Master::mpSceneManager->SetNextScene(SceneManager::SCENE_TYPE::LOADING_3D);
 	}
 
 	// 基底クラスの更新処理を呼びだす

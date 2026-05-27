@@ -63,10 +63,10 @@ std::string Enemy3D::GetModelPath(Enemy3D::EnemyType type)
 		return "Resource/3D/Enemy/broccoli.mqo";
 
 	case Jumper:
-		return "Resource/3D/Enemy/tomato.mqo";
+		return "Resource/3D/Enemy/omelette.mqo";
 
 	case Runner:
-		return "Resource/3D/Enemy/Tank.mqo";
+		return "Resource/3D/Enemy/tomato.mqo";
 
 	default:
 		return "Resource/3D/Enemy/Default.mqo";
@@ -93,8 +93,8 @@ void Enemy3D::Update()
 
 
 	// d—Í ‚±‚ê‚Å—‰º‚ ‚è‚É‚È‚é
-	mfYVelocity += mfGravity;
-	mvPosition.y += mfYVelocity;
+	//mfYVelocity += mfGravity;
+	//mvPosition.y += mfYVelocity;
 
 	// —‰º‚µ‚½‚Æ‚«‚Ííœ
 	if (mvPosition.y < -4000.0f) SetDeleteFlag(true);

@@ -31,6 +31,11 @@ public:
 private:
     int m_selectedId = 0; // 今操作対象にしている敵のID
     std::vector<Enemy3D*> m_enemyList; // 敵の管理用
+
+private:
+    std::vector<VECTOR> m_recordedEnemyPositions; // 記録用リスト
+
+
 private:
     std::vector<EnemyData> m_savedEnemyList; // ファイル保存用のリスト
 };

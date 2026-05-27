@@ -4,24 +4,33 @@
 #include "Scene.h"
 #include "ObjectManager.h"
 
-// コンストラクタ
+// ファイル名版
 SkyBox::SkyBox(std::string filename)
 	: Object3D(VGet(0.0f, 0.0f, 0.0f))
+	, mpModel(nullptr)
+	, mfRotation(0.0f)
+	, m_ownsModel(true)
 {
-	// スカイボックスモデルの生成
-	// note: スカイボックスの座標は、基本的には原点。
-	//       ものによっては、座標を常にプレイヤーの座標にすることで、空が見切れないようにすることもある。
 	mpModel = new Model(filename, VGet(0.0f, 0.0f, 0.0f));
-	mfRotation = 0.0f; //初期化
 }
 
-// デストラクタ
+// ハンドル版
+SkyBox::SkyBox(int modelHandle)
+	: Object3D(VGet(0.0f, 0.0f, 0.0f))
+	, mpModel(nullptr)
+	, mfRotation(0.0f)
+	, m_ownsModel(false)
+{
+	// Model(int handle, VECTOR initPos) を使ってラップ
+	mpModel = new Model(modelHandle, VGet(0.0f, 0.0f, 0.0f));
+}
+
 SkyBox::~SkyBox()
 {
-	// モデルクラスの破棄
 	if (mpModel != nullptr)
 	{
 		delete mpModel;
+		mpModel = nullptr;
 	}
 }
 
@@ -34,24 +43,12 @@ void SkyBox::Update()
 	}
 
 
-	//// 回転するようにした　1210
-	//mfRotation += 0.0003f; // ここで回転速度
-	//if (mfRotation > DX_TWO_PI_F) // 360を越したら
-	//{
-	//	mfRotation -= DX_TWO_PI_F; // 今の回転角から３６０分引く
-	//}
-	//mvRotation.y = mfRotation;
-	//mpModel->SetRotation(mvRotation); // modelに回転速度をセット
-
-
 	// プレイヤーの情報取得
 	auto pPlayer = Master::mpSceneManager->GetCurrentScene()
 		->GetObjectManager()->GetObject3DByTag(Object3D::T_Player3D);
 
 	if (pPlayer != nullptr)
 	{
-		// でかくしすぎたらカメラがバグるので、追跡するようにした。
-		//　追跡させたらおおきくて敵が隠れるからやめたほうが良いかも？
 		VECTOR playerPos = pPlayer->GetPosition();
 		mpModel->SetPosition(VGet(playerPos.x, 0.0f, playerPos.z));
 	}
@@ -74,17 +71,11 @@ void SkyBox::Draw()
 // 拡大値（スケール値）の設定（Modelクラスへの橋渡し）
 void SkyBox::SetScale(float scale)
 {
-	if (mpModel != nullptr)
-	{
-		mpModel->SetScale(scale);
-	}
+	if (mpModel) mpModel->SetScale(scale);
 }
 
 // モデルのテクスチャ変更（Modelクラスへの橋渡し）
 void SkyBox::SetModelTexture(std::string filename, int index)
 {
-	if (mpModel != nullptr)
-	{
-		mpModel->SetTexture(filename, index);
-	}
+	if (mpModel) mpModel->SetTexture(filename, index);
 }
