@@ -13,7 +13,7 @@
 
 // コンストラクタ：Character3D の判定パラメータはここで調整する
 Player3D::Player3D(VECTOR initPos, std::string filename)
-	: Character3D(initPos, 5, Team::Player, 30.0f) // maxHp, team, radius
+	: Character3D(initPos, 50000, Team::Player, 30.0f) // maxHp, team, radius
 	, mfAngle(0.0f)
 	, mfTargetAngle(0.0f)
 {
