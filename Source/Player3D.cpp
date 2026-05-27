@@ -78,7 +78,7 @@ void Player3D::Update()
 	ResolveCollision3D();
 
 	// キャラ同士の押し戻し
-	ResolveCharacterPush();
+	//ResolveCharacterPush();
 
 	// モデル同期（位置・回転をモデルに反映）
 	SyncModel();
