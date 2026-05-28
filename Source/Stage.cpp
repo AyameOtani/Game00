@@ -79,7 +79,7 @@ void Stage::Update()
 
 	case StageType::Moving:
 		// 上下運動：正弦波（sin）を用いてY軸方向に往復移動させる
-		mvPosition.x = sinf(mfMoveTime) * 300.0f;
+		//mvPosition.x = sinf(mfMoveTime) * 300.0f;
 		break;
 
 	case StageType::Rotating:
