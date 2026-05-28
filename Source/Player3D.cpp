@@ -141,69 +141,118 @@ void Player3D::Shot()
 	mfShotTimer = SHOT_INTERVAL;
 }
 
-// 移動処理：キー入力とスティック入力からベクトルを作成
+// 移動処理：キー入力とスティック入力から移動ベクトルを作成
 void Player3D::MoveEx()
 {
+	// 最終的な移動方向
 	VECTOR moveVec = VGet(0.0f, 0.0f, 0.0f);
+
+	// カメラ基準の前方向と左方向
 	VECTOR upMoveVector = VGet(0.0f, 0.0f, 0.0f);
 	VECTOR leftMoveVector = VGet(0.0f, 0.0f, 0.0f);
 
-	// カメラの視点から前後左右のベクトルを算出
+	// カメラ基準の移動方向を作る
 	{
-		upMoveVector = VSub(Master::mpCamera->GetLookAtPosition(), Master::mpCamera->GetPosition());
-		upMoveVector.y = 0.0f;
+		// カメラの前方向を取得
+		upMoveVector = VSub(Master::mpCamera->GetLookAtPosition(),Master::mpCamera->GetPosition());
+		upMoveVector.y = 0.0f; // 上下成分を消してXZ平面だけにする
+
+		// 前方向とY軸(上)から左方向を計算（外積）
 		leftMoveVector = VCross(upMoveVector, VGet(0.0f, 1.0f, 0.0f));
 		leftMoveVector.y = 0.0f;
-		upMoveVector = VNorm(upMoveVector);
+		upMoveVector = VNorm(upMoveVector); // 正規化
 		leftMoveVector = VNorm(leftMoveVector);
 	}
 
-	// キーボード入力による移動加算
-	if (CheckHitKey(KEY_INPUT_A)) moveVec = VAdd(moveVec, leftMoveVector);
-	if (CheckHitKey(KEY_INPUT_D)) moveVec = VAdd(moveVec, VScale(leftMoveVector, -1.0f));
-	if (CheckHitKey(KEY_INPUT_W)) moveVec = VAdd(moveVec, upMoveVector);
-	if (CheckHitKey(KEY_INPUT_S)) moveVec = VAdd(moveVec, VScale(upMoveVector, -1.0f));
+	// キーボード入力
+	if (CheckHitKey(KEY_INPUT_A))
+		moveVec = VAdd(moveVec, leftMoveVector);          // 左
 
-	// ゲームパッドのアナログスティック入力処理
+	if (CheckHitKey(KEY_INPUT_D))
+		moveVec = VAdd(moveVec, VScale(leftMoveVector, -1.0f)); // 右
+
+	if (CheckHitKey(KEY_INPUT_W))
+		moveVec = VAdd(moveVec, upMoveVector);           // 前
+
+	if (CheckHitKey(KEY_INPUT_S))
+		moveVec = VAdd(moveVec, VScale(upMoveVector, -1.0f));   // 後ろ
+
+	// ゲームパッド入力
 	int StickX, StickY;
 	VECTOR moveVecPad = VGet(0.0f, 0.0f, 0.0f);
+	// アナログスティック取得
 	GetJoypadAnalogInput(&StickX, &StickY, DX_INPUT_PAD1);
-	const int stickDeadZone = 50;
+	const int stickDeadZone = 50; // 微入力を無視する範囲
+	if (StickX < -stickDeadZone)
+		moveVecPad = VAdd(moveVecPad, leftMoveVector);          // 左
 
-	if (StickX < -stickDeadZone) moveVecPad = VAdd(moveVecPad, leftMoveVector);
-	if (StickX > stickDeadZone)  moveVecPad = VAdd(moveVecPad, VScale(leftMoveVector, -1.0f));
-	if (StickY < -stickDeadZone) moveVecPad = VAdd(moveVecPad, upMoveVector);
-	if (StickY > stickDeadZone)  moveVecPad = VAdd(moveVecPad, VScale(upMoveVector, -1.0f));
+	if (StickX > stickDeadZone)
+		moveVecPad = VAdd(moveVecPad, VScale(leftMoveVector, -1.0f)); // 右
 
+	if (StickY < -stickDeadZone)
+		moveVecPad = VAdd(moveVecPad, upMoveVector);            // 前
+
+	if (StickY > stickDeadZone)
+		moveVecPad = VAdd(moveVecPad, VScale(upMoveVector, -1.0f));   // 後ろ
+
+
+	// キーボード＋パッド合成
 	moveVec = VAdd(moveVec, moveVecPad);
 
-	// ターゲット角度（向き）の更新
 	VECTOR targetDir = VGet(0, 0, 0);
+	// 入力の大きさ（移動しているか）
 	float inputMag = VSize(moveVec);
+
 	if (inputMag > 0.0001f)
 	{
-		targetDir = VNorm(moveVec);
+		targetDir = VNorm(moveVec); // 正規化
+		// 進む方向に向きを向ける（XZ平面）
 		mfTargetAngle = atan2f(targetDir.x, targetDir.z);
 	}
 
-	const float dt = 1.0f / 60.0f;
-	VECTOR targetVel = VScale(targetDir, mfSpeed * (inputMag > 0.0001f ? 1.0f : 0.0f));
-
-	// 加減速の計算
-	float accel = mbIsGround ? mfAccel : mfAirAccel;
-	if (VSize(targetVel) < VSize(mvVelocity)) accel = mbIsGround ? mfDecel : mfAirDecel;
-
-	VECTOR deltaV = VSub(targetVel, mvVelocity);
-	float deltaLen = VSize(deltaV);
-	if (deltaLen > 0.0001f)
+	float speed = mfSpeed;
+	// Shift押下でスピードアップ
+	if (CheckHitKey(KEY_INPUT_LSHIFT))
 	{
-		float maxStep = accel * dt;
-		if (deltaLen <= maxStep) mvVelocity = targetVel;
-		else mvVelocity = VAdd(mvVelocity, VScale(VNorm(deltaV), maxStep));
+		speed *= 4.0f; // デバッグ用倍率
 	}
 
-	mvPosition = VAdd(mvPosition, VScale(mvVelocity, 1.0f));
+	const float dt = 1.0f / 60.0f; // デルタタイム
+	// 目標速度（方向 × スピード）
+	VECTOR targetVel = VScale(targetDir, speed * (inputMag > 0.0001f ? 1.0f : 0.0f));
+
+	// 地上か空中で加速度を変える
+	float accel = mbIsGround ? mfAccel : mfAirAccel;
+
+	// 減速時は別の値を使う
+	if (VSize(targetVel) < VSize(mvVelocity))
+		accel = mbIsGround ? mfDecel : mfAirDecel;
+
+	// 現在速度との差分
+	VECTOR deltaV = VSub(targetVel, mvVelocity);
+	float deltaLen = VSize(deltaV);
+
+	if (deltaLen > 0.0001f)
+	{
+		// 1フレームで変化できる最大量
+		float maxStep = accel * dt;
+
+		if (deltaLen <= maxStep)
+		{
+			// 目標に到達
+			mvVelocity = targetVel;
+		}
+		else
+		{
+			// 徐々に近づける
+			mvVelocity = VAdd(mvVelocity,VScale(VNorm(deltaV), maxStep));
+		}
+	}
+
+	// 位置更新
+	mvPosition = VAdd(mvPosition,VScale(mvVelocity, 1.0f));
 }
+
 
 void Player3D::RotationByMove()
 {

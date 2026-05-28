@@ -36,8 +36,8 @@ Character3D::Character3D(VECTOR initPos, int maxHp, Team team, float radius)
 	, mbFall(false)                              // 落下中フラグ
 	, mfGroundY(-FLT_MAX)                        // 接地地面Y
 	, mfAngle(0.0f)                              // 向き角度
-	, mfAccel(40.0f)                             // 地上加速
-	, mfDecel(80.0f)                             // 地上減速
+	, mfAccel(50.0f)                             // 地上加速
+	, mfDecel(140.0f)                             // 地上減速
 	, mfAirAccel(5.0f)                           // 空中加速
 	, mfAirDecel(10.0f)                          // 空中減速
 	, mfJumpPower(30.0f)                         // ジャンプ力

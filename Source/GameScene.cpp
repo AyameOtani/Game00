@@ -42,6 +42,7 @@ namespace
 //--------------------------------------------------
 GameScene::GameScene()
 	: Scene()
+	, mvGoalPosition(VGet(15590.0f, 2600.0f, 14430.0f))
 {
 	SetFontSize(60);
 
@@ -63,17 +64,17 @@ void GameScene::Initialize()
 	Master::mpCamera->Reset();
 	Master::mpCamera->SetTitleMode(false);
 
-	// SkyBox
-	if (Master::mnSkyModelHandle != -1)
-	{
-		auto* sky = new SkyBox(Master::mnSkyModelHandle);
-		sky->SetScale(10.0f);
-	}
-	else
-	{
-		auto* sky = new SkyBox("Resource/3D/SkyBox/sky.mqo");
-		sky->SetScale(10.0f);
-	}
+	//// SkyBox
+	//if (Master::mnSkyModelHandle != -1)
+	//{
+	//	auto* sky = new SkyBox(Master::mnSkyModelHandle);
+	//	sky->SetScale(10.0f);
+	//}
+	//else
+	//{
+	//	auto* sky = new SkyBox("Resource/3D/SkyBox/sky.mqo");
+	//	sky->SetScale(10.0f);
+	//}
 
 	// Player
 	Player3D* player = new Player3D(VGet(0, 100, 0), "Resource/3D/Player/octopus.mqo");
@@ -186,13 +187,13 @@ void GameScene::Update()
 
 		// ゴール判定 (球判定)
 		VECTOR playerPos = player->GetPosition();
-		VECTOR goalPos = VGet(15590.0f, 3000.0f, 14430.0f);
+		
 		// プレイヤーとゴール間の距離を計算
-		float dist = VSize(VSub(playerPos, goalPos));
+		float dist = VSize(VSub(playerPos, mvGoalPosition));
 
 		if (dist < mfGoalRadius)
 		{
-			// ゴール！
+			// ゴール
 			Master::mpSceneManager->SetNextScene(SceneManager::SCENE_TYPE::WIN_RESULT_3D);
 			return;
 		}
@@ -283,7 +284,7 @@ void GameScene::Draw()
 	DrawBillboard3D(goalPos, 0.5f, 0.5f, 800.0f, 0.0f, mnGoalHandle, TRUE);
 
 	// goalのあたり判定デバッグ用
-	DrawSphere3D(goalPos, mfGoalRadius, 16, GetColor(0, 255, 0), GetColor(0, 255, 0), FALSE);
+	DrawSphere3D(mvGoalPosition, mfGoalRadius, 16, GetColor(0, 255, 0), GetColor(0, 255, 0), FALSE);
 
 
 	Scene::Draw();
