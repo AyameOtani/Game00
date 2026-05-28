@@ -37,15 +37,8 @@ public:
 private:
 	Model* mpModel = nullptr;
 
-	// 移動・ジャンプパラメータ（Character3D 側にもあるが、Player固有の値を保持）
+	// ジャンプパラメータ
 	float mfSpeed = 15.0f;
-	VECTOR mvVelocity = VGet(0.0f, 0.0f, 0.0f);
-	float mfAccel = 40.0f;
-	float mfDecel = 80.0f;
-	float mfAirAccel = 15.0f;
-	float mfAirDecel = 10.0f;
-
-	float mfAngle;
 	float mfTargetAngle;
 
 	// 連射を制限するためのタイマー用変数

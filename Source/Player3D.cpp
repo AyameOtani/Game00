@@ -14,11 +14,21 @@
 // コンストラクタ：Character3D の判定パラメータはここで調整する
 Player3D::Player3D(VECTOR initPos, std::string filename)
 	: Character3D(initPos, 50000, Team::Player, 30.0f) // maxHp, team, radius
-	, mfAngle(0.0f)
 	, mfTargetAngle(0.0f)
 {
 	mpModel = new Model(filename, initPos);
 	SetTag(Tag3D::T_Player3D);
+
+	// 親クラスの変数を個別に調整
+	this->mfAccel = 50.0f;
+	this->mfDecel = 140.0f;
+	this->mfAirAccel = 15.0f;
+	this->mfAirDecel = 10.0f;
+	this->mfAngle = 0.0f;
+	this->mfJumpPower = 30.0f;
+
+	// 必要であれば mvVelocity もリセット
+	this->mvVelocity = VGet(0.0f, 0.0f, 0.0f);
 
 	// Player 固有の当たり判定パラメータ調整（Character3D の protected メンバへ代入）
 
@@ -78,7 +88,7 @@ void Player3D::Update()
 	ResolveCollision3D();
 
 	// キャラ同士の押し戻し
-	//ResolveCharacterPush();
+	ResolveCharacterPush();
 
 	// モデル同期（位置・回転をモデルに反映）
 	SyncModel();

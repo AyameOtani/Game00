@@ -134,12 +134,30 @@ void LoadingScene::Draw()
 	SetUseZBufferFlag(FALSE);
 	SetWriteZBufferFlag(FALSE);
 
+	// 1. ローディングテキスト
 	DrawFormatString(
 		Utility::SCREEN_WIDTH / 2 - 100,
-		Utility::SCREEN_HEIGHT / 2,
+		Utility::SCREEN_HEIGHT / 2 - 50,
 		GetColor(255, 255, 255),
 		"Loading..."
 	);
+
+	// 2. ローディングバーの描画
+	const int barWidth = 400;  // バー全体の横幅
+	const int barHeight = 20;  // バーの縦幅
+	const int startX = Utility::SCREEN_WIDTH / 2 - barWidth / 2;
+	const int startY = Utility::SCREEN_HEIGHT / 2 + 20;
+
+	// 枠を描画（白）
+	DrawBox(startX, startY, startX + barWidth, startY + barHeight, GetColor(255, 255, 255), FALSE);
+
+	// 進捗率を計算
+	float progress = (float)mnProgressCounter / 8.0f;
+	if (progress > 1.0f) progress = 1.0f; // 100% で止める
+	int currentWidth = (int)(barWidth * progress);
+
+	// 中身を描画（緑）
+	DrawBox(startX, startY, startX + currentWidth, startY + barHeight, GetColor(0, 255, 0), TRUE);
 
 	SetUseZBufferFlag(TRUE);
 	SetWriteZBufferFlag(TRUE);

@@ -47,9 +47,11 @@ private:
 
 	// 発射管理
 	float mfShotTimer = 0.0f;
-	static constexpr float SHOT_INTERVAL = 60.0f;
+	static constexpr float SHOT_INTERVAL = 120.0f;
 
 	// 表示用 ID
 	int m_id = -1;
 	static int s_nextEnemyID;
+private:
+	float mfJumpTimer = 0.0f; // ジャンプ用のタイマー
 };

@@ -25,8 +25,13 @@ public:
 
     void SaveEnemyDataToFile();
 
-    //int GetEnemyTypeFromID(int id);
     Enemy3D::EnemyType GetEnemyTypeFromID(int id);
+
+    struct EnemySpawnData
+    {
+        VECTOR pos;
+        Enemy3D::EnemyType type;
+    };
 
 private:
     int m_selectedId = 0; // 今操作対象にしている敵のID

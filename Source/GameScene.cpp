@@ -77,36 +77,33 @@ void GameScene::Initialize()
 		sky->SetScale(12.0f);
 	}
 
-	// Player
 	Player3D* player = new Player3D(VGet(0, 100, 0), "Resource/3D/Player/octopus.mqo");
 
-	// Enemy spawn
-	std::vector<VECTOR> enemyPosList =
+
+	std::vector<EnemySpawnData> enemySpawnList =
 	{
-		VGet(-5.86604f, -146.696f, 2920.01f),   // ID:0
-		VGet(204.082f,  -146.696f, 4660.06f),   // ID:1
-		VGet(-203.793f, -78.395f, 5530.63f),    // ID:2
-		VGet(213.696f,  -78.395f, 5533.55f),    // ID:3
-		VGet(22.8382f,  -78.395f, 6059.9f),     // ID:4
-		VGet(1.87232f,  -629.002f, 8687.09f),   // ID:5
-		VGet(346.933f,  -629.002f, 9014.21f),   // ID:6
-		VGet(-320.357f, -629.002f, 9121.35f),   // ID:7
-
-		VGet(-320.357f, -629.002f, 9121.35f),   // ID:8 (duplicate)
-		VGet(-320.357f, -629.002f, 9121.35f),   // ID:9
-		VGet(-320.357f, -629.002f, 9121.35f),   // ID:10
-		VGet(-320.357f, -629.002f, 9121.35f),   // ID:11
-		VGet(-320.357f, -629.002f, 9121.35f),   // ID:12
-		VGet(-320.357f, -629.002f, 9121.35f),   // ID:13
-		VGet(-320.357f, -629.002f, 9121.35f),   // ID:14
-
-		VGet(6.37415f,  -472.422f, 11401.8f)    // ID:15
+		{ VGet(3359.66f,  -9.249f,   -3.62714f), Enemy3D::EnemyType::Jumper }, // ID:0
+		{ VGet(9068.31f,  126.234f,  56.1533f),  Enemy3D::EnemyType::Attacker }, // ID:1
+		{ VGet(9524.75f,  126.234f,  667.882f),  Enemy3D::EnemyType::Jumper }, // ID:2
+		{ VGet(9280.21f,  126.234f,  1281.94f),  Enemy3D::EnemyType::Attacker }, // ID:3
+		{ VGet(9812.92f,  891.537f,  3717.11f),  Enemy3D::EnemyType::Attacker }, // ID:4
+		{ VGet(9238.21f,  891.538f,  4081.83f),  Enemy3D::EnemyType::Attacker }, // ID:5
+		{ VGet(4149.27f,  1520.65f,  3620.09f),  Enemy3D::EnemyType::Attacker }, // ID:6
+		{ VGet(4685.61f,  1520.65f,  4264.24f),  Enemy3D::EnemyType::Attacker }, // ID:7
+		{ VGet(4872.89f,  1516.53f,  9233.34f),  Enemy3D::EnemyType::Attacker }, // ID:8
+		{ VGet(3907.02f,  1516.53f,  9254.33f),  Enemy3D::EnemyType::Attacker }, // ID:9
+		{ VGet(7761.36f,  1265.33f,  8820.87f),  Enemy3D::EnemyType::Attacker }, // ID:10
+		{ VGet(7865.66f,  1265.33f,  9675.2f),   Enemy3D::EnemyType::Attacker }, // ID:11
+		{ VGet(7258.23f,  1265.33f,  9237.93f),  Enemy3D::EnemyType::Attacker }, // ID:12
+		{ VGet(15778.7f,  2254.78f,  9494.45f),  Enemy3D::EnemyType::Attacker }, // ID:13
+		{ VGet(15231.2f,  2254.78f,  8963.72f),  Enemy3D::EnemyType::Attacker }, // ID:14
+		{ VGet(15390.4f,  2318.83f,  10858.9f),  Enemy3D::EnemyType::Attacker }  // ID:15
 	};
 
 	int id = 0;
-	for (auto& pos : enemyPosList)
+	for (auto& spawn : enemySpawnList)
 	{
-		Enemy3D* enemy = new Enemy3D(pos, Enemy3D::EnemyType::Attacker);
+		Enemy3D* enemy = new Enemy3D(spawn.pos, spawn.type);
 		enemy->SetID(id++);
 		m_enemyList.push_back(enemy);
 	}

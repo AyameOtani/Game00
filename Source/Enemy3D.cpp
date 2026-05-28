@@ -30,7 +30,7 @@ Enemy3D::Enemy3D(VECTOR initPos, EnemyType type)
 	m_radius = 60.0f;
 	m_ceilRadius = 75.0f; // 天井判定用半径
 
-
+	this->mfJumpPower = 30.0f;
 	// 床判定
 	m_floorCapsuleMinY = 3.0f;
 	m_floorCapsuleMaxY = 40.0f;
@@ -92,9 +92,27 @@ void Enemy3D::Update()
 	mvOldPosition = mvPosition;
 
 
+
+	// Jumper 用の自動ジャンプ処理
+	if (m_type == Jumper)
+	{
+		// 地面にいて、かつタイマーが0以下ならジャンプ
+		if (mbIsGround)
+		{
+			mfJumpTimer -= 1.0f; // 毎フレーム減らす
+			if (mfJumpTimer <= 0.0f)
+			{
+				mfYVelocity = mfJumpPower; // ジャンプパワー（必要に応じて調整）
+				mbIsGround = false;
+				mfJumpTimer = 120.0f; // 次のジャンプまでの間隔（約2秒）
+			}
+		}
+	}
+
+
 	// 重力 これで落下ありになる
-	//mfYVelocity += mfGravity;
-	//mvPosition.y += mfYVelocity;
+	mfYVelocity += mfGravity;
+	mvPosition.y += mfYVelocity;
 
 	// 落下したときは削除
 	if (mvPosition.y < -4000.0f) SetDeleteFlag(true);
@@ -188,10 +206,26 @@ void Enemy3D::Shot()
 {
 	if (m_type != Attacker) return;
 
-	VECTOR spawnPos = VAdd(mvPosition, VGet(0.0f, 30.0f, 0.0f));
-	VECTOR shotDir = VGet(sinf(mfAngle), 0.0f, cosf(mfAngle));
+	// プレイヤーの情報を取得
+	auto playerList = Master::mpSceneManager->GetCurrentScene()->GetObjectManager()->GetObject3DListByTag(Object3D::T_Player3D);
 
-	new Bullet3D(spawnPos, "Resource/3D/Bullet/EnemyBullet.mqo", shotDir, Team::Enemy);
+	// プレイヤーがいない場合は撃たない
+	if (playerList.empty()) return;
+
+	// 最初のプレイヤー（リストの先頭）をターゲットにする
+	Object3D* player = playerList[0];
+	VECTOR playerPos = player->GetPosition();
+
+	// 弾のスポーン位置
+	VECTOR spawnPos = VAdd(mvPosition, VGet(0.0f, 30.0f, 0.0f));
+
+	// プレイヤーへの向きを計算 (正規化して方向ベクトルを作る)
+	VECTOR dir = VSub(playerPos, mvPosition);
+	dir.y = 0.0f; // Y軸方向のズレを無視して水平に飛ばす場合
+	dir = VNorm(dir); // 長さを1にする
+
+	// 弾を発射
+	new Bullet3D(spawnPos, "Resource/3D/Bullet/EnemyBullet.mqo", dir, Team::Enemy);
 }
 
 // モデル同期（Character3D::SyncModel の実装）
