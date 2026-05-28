@@ -22,6 +22,11 @@ Stage::Stage(std::string stageModelName, std::string stageCollisionModelName, St
 	{
 		MV1SetupCollInfo(mnCollisionHandle, -1);
 	}
+
+	m_prevPosition = VGet(0, 0, 0);
+	m_prevRotation = VGet(0, 0, 0);
+	m_posDelta = VGet(0, 0, 0);
+	m_rotDelta = VGet(0, 0, 0);
 }
 
 // コンストラクタ（外部からハンドルを受け取って生成する場合）
@@ -74,7 +79,7 @@ void Stage::Update()
 
 	case StageType::Moving:
 		// 上下運動：正弦波（sin）を用いてY軸方向に往復移動させる
-		mvPosition.y = sinf(mfMoveTime) * 300.0f;
+		mvPosition.x = sinf(mfMoveTime) * 300.0f;
 		break;
 
 	case StageType::Rotating:
@@ -112,6 +117,12 @@ void Stage::Update()
 		// コリジョン情報を最新の位置・回転に同期
 		MV1RefreshCollInfo(mnCollisionHandle);
 	}
+
+	m_posDelta = VSub(mvPosition, m_prevPosition);
+	m_rotDelta = VSub(mvRotation, m_prevRotation);
+
+	m_prevPosition = mvPosition;
+	m_prevRotation = mvRotation;
 }
 
 // 描画処理

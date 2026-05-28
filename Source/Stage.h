@@ -50,4 +50,14 @@ private:
 	float mfRotation;
 	bool mbRota;
 	float mfMoveTime;
+
+	// --- 追加部分 ---
+	VECTOR m_prevPosition; // 前フレームの座標
+	VECTOR m_prevRotation; // 前フレームの回転
+	VECTOR m_posDelta;     // 1フレームあたりの移動量
+	VECTOR m_rotDelta;     // 1フレームあたりの回転変化量
+
+public:
+	VECTOR GetPositionDelta() const { return m_posDelta; }
+	VECTOR GetRotationDelta() const { return m_rotDelta; }
 };

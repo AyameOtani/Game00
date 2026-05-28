@@ -66,6 +66,10 @@ void Character3D::ResolveCollision3D()
 	float ceilMaxY = -FLT_MAX;
 	float bestFloorY = -FLT_MAX;
 
+	// 接地したステージの移動量を保持する変数
+	VECTOR totalMoveDelta = VGet(0, 0, 0);
+	bool isGroundedStageFound = false;
+
 	// 足元・床検出用のサンプルオフセット（5点チェック）
 	const float step = m_floorLinePos;
 	const VECTOR kOffsets[5] =
@@ -127,7 +131,7 @@ void Character3D::ResolveCollision3D()
 		}
 	}
 
-	// 壁法線を使って移動ベクトルをスライドさせる（壁に沿って滑らせる）
+	// 壁法線を使って移動ベクトルをスライドさせる
 	if (hitCount > 0 && VSize(avgNormal) > 0.0001f)
 	{
 		avgNormal = VNorm(avgNormal);
@@ -144,7 +148,7 @@ void Character3D::ResolveCollision3D()
 		mvPosition.z = targetPos.z;
 	}
 
-	// Y方向は一旦そのまま適用（床・天井判定で補正する）
+	// Y方向は一旦そのまま適用
 	mvPosition.y = targetPos.y;
 
 	VECTOR floorNormal = VGet(0, 1, 0);
@@ -158,31 +162,38 @@ void Character3D::ResolveCollision3D()
 		if (!pStage) continue;
 
 		// ------------------------------
-		// 床判定（複数点レイで一番高い床を採用）
+		// 床判定
 		// ------------------------------
+		// 足元の複数点（kOffsets）に対して、床判定用の垂直レイ（線分）を順次チェック
 		for (const auto& offset : kOffsets)
 		{
+			// レイの始点と終点を算出（キャラ位置 + オフセット + 上下オフセット）
 			VECTOR start = VAdd(mvPosition, VAdd(offset, VGet(0, m_floorLineMinY, 0)));
 			VECTOR end = VAdd(mvPosition, VAdd(offset, VGet(0, m_floorLineMaxY, 0)));
 
+			// ステージの当たり判定を実行し、ヒット位置（地面のY座標など）を取得
 			VECTOR hitPos = pStage->CheckHit_Line(start, end);
 
-			DrawLine3D(start, end, GetColor(255, 0, 0)); // デバッグ表示
+			// デバッグ用に、現在判定を行っている線分を画面に描画
+			DrawLine3D(start, end, GetColor(255, 0, 0));
 
-			// ヒット位置が有効なら
+			// ヒット位置が(0,0,0)以外（つまり床に衝突した）か確認
 			if (VSize(hitPos) > 0.0001f)
 			{
-				// ラインと床が交差した = 足元に床が存在する
+				// 少なくとも一つ床に当たったのでフラグを立てる
 				isHitFloor = true;
 
-				// 複数ヒットした中で一番高い床を採用する
-				// （段差や坂で低い床を拾って沈み込むのを防ぐ）
+				// 複数のチェックポイントの中で、一番高いY座標（一番高い床）を採用
+				// （段差や坂道で誤った低い位置にめり込むのを防ぐため）
 				if (hitPos.y > bestFloorY)
 				{
 					bestFloorY = hitPos.y;
 
-					// 採用した床地点の法線を取得
-					// → 傾きに応じたキャラの姿勢補正や坂滑り計算に使用
+					// どのステージに接地しているかを特定し、そのステージの移動量（delta）を保存
+					totalMoveDelta = pStage->GetPositionDelta();
+					isGroundedStageFound = true;
+
+					// 採用した床地点の法線を取得（坂道での姿勢制御用）
 					VECTOR tmpNormal;
 					if (pStage->CheckHit_Line_Normal(start, end, tmpNormal))
 					{
@@ -193,26 +204,35 @@ void Character3D::ResolveCollision3D()
 		}
 
 		// ------------------------------
-		// 天井判定（カプセル + レイ）
+		// 天井判定
 		// ------------------------------
+		// カプセル判定で頭上に何らかのステージが存在するかを事前にチェック（負荷軽減のため）
 		if (pStage->CheckHit_Capsule(
 			VAdd(mvPosition, VGet(0, m_ceilCapsuleMinY, 0)),
 			VAdd(mvPosition, VGet(0, m_ceilCapsuleMaxY, 0)),
 			m_ceilRadius))
 		{
+			// ステージが存在する場合、さらに詳細な位置を特定するためにレイ（線分）判定を行う
 			for (const auto& offset : kOffsets)
 			{
+				// レイの始点と終点を算出（キャラ位置 + オフセット + 頭上方向の高さ）
 				VECTOR start = VAdd(mvPosition, VAdd(offset, VGet(0, m_ceilLineMinY, 0)));
 				VECTOR end = VAdd(mvPosition, VAdd(offset, VGet(0, m_ceilLineMaxY, 0)));
 
+				// デバッグ用に、現在判定を行っているレイを青色で描画
 				DrawLine3D(start, end, GetColor(0, 0, 255));
 
+				// レイが天井にヒットしたか確認
 				VECTOR hit = pStage->CheckHit_Line(start, end);
 				if (VSize(hit) > 0.0001f)
 				{
+					// 天井に当たったのでフラグを立てる
 					isHitCeiling = true;
 
+					// ヒットした中で一番低いY座標を保持（頭がぶつかる高さを特定するため）
 					if (hit.y < ceilMinY) ceilMinY = hit.y;
+
+					// （補足：ceilMaxYについては、この後の押し戻し処理で必要になる場合に備えて保持）
 					if (hit.y > ceilMaxY) ceilMaxY = hit.y;
 				}
 			}
@@ -226,21 +246,24 @@ void Character3D::ResolveCollision3D()
 	{
 		float footY = mvPosition.y + m_floorCapsuleMinY - m_radius;
 
-		// プレイヤーは「落下中」かつ「床に近い」ときのみ接地
-		// 敵は「床に近い」なら即接地（重力追従）
 		bool isGrounded = false;
 		if (m_team == Team::Player)
 		{
-			// 落下しているかつ足元が床に近いときのみ接地させる
 			if (mfYVelocity <= 0 && footY <= bestFloorY + 10.0f) isGrounded = true;
 		}
 		else
 		{
-			if (footY <= bestFloorY + 5.0f) isGrounded = true; // 5.0f は適宜調整してください
+			if (footY <= bestFloorY + 5.0f) isGrounded = true;
 		}
 
 		if (isGrounded)
 		{
+			// 【追加】接地しているならステージの移動量を反映
+			if (isGroundedStageFound)
+			{
+				mvPosition = VAdd(mvPosition, totalMoveDelta);
+			}
+
 			// 床にスナップ
 			mvPosition.y = bestFloorY - m_floorCapsuleMinY + m_radius;
 

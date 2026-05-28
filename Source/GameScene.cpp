@@ -116,6 +116,9 @@ void GameScene::Initialize()
 		5.0f
 	);
 
+	Stage* sss = new Stage("Resource/3D/Stage1/sss.mqo", "Resource/3D/Stage1/sss.mqo", Stage::StageType::Moving);
+	sss->SetScale(5.0f);
+
 	//// 移動ステージ
 	//CreateStage(
 	//	Master::mnStageMoveHandle,
