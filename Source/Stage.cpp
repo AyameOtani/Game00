@@ -74,32 +74,33 @@ void Stage::Update()
 	switch (m_type)
 	{
 	case StageType::Static:
-		// 静止状態：一切の移動・回転を行わない
+		// 静止
 		break;
 
-	case StageType::Moving:
+	case StageType::MoveSide:
+		// 左右運動：正弦波（sin）を用いてX軸方向に往復移動させる
+		mvPosition.x = sinf(mfMoveTime) * 300.0f;
+		break;
+
+
+	case StageType::MoveUpDown:
 		// 上下運動：正弦波（sin）を用いてY軸方向に往復移動させる
-		//mvPosition.x = sinf(mfMoveTime) * 300.0f;
+		mvPosition.y = sinf(mfMoveTime) * 300.0f;
 		break;
 
-	case StageType::Rotating:
-		// 大きな揺れ：Z軸に対して比較的大きく左右に傾きを繰り返す
-	{
-		float tilt = sinf(mfMoveTime * 0.7f) * 0.8f;
-		mvRotation.z = tilt;
-	}
-	break;
 
-	case StageType::LittleRotation:
-		// 小さな揺れ：Z軸に対して緩やかに小さく傾きを繰り返す
-	{
-		float little = sinf(mfMoveTime * 0.5f) * 0.4f;
-		mvRotation.z = little;
-	}
-	break;
+	case StageType::Rotate:
+		{
+			// mfMoveTime に 0.7 を掛けて 揺れるスピードを少し遅くしている
+			// 0.8f は最大傾きの大きさ
+			float tilt = sinf(mfMoveTime * 0.7f) * 0.8f;
+			mvRotation.z = tilt;
+		}
+		break;
+
 
 	default:
-		// 未定義のタイプが指定された場合は静止状態にリセット
+		// 未定義のタイプが指定された場合は静止状態する
 		m_type = StageType::Static;
 		break;
 	}
@@ -118,9 +119,9 @@ void Stage::Update()
 		MV1RefreshCollInfo(mnCollisionHandle);
 	}
 
+	// プレイヤーとかも一緒に動かすための位置
 	m_posDelta = VSub(mvPosition, m_prevPosition);
 	m_rotDelta = VSub(mvRotation, m_prevRotation);
-
 	m_prevPosition = mvPosition;
 	m_prevRotation = mvRotation;
 }

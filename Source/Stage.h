@@ -7,12 +7,13 @@ class Model;
 class Stage : public Object3D
 {
 public:
+	// ステージの種類
 	enum class StageType
 	{
-		Static,
-		Moving,
-		Rotating,
-		LittleRotation
+		Static,     // 動きなし
+		MoveSide,   // 左右に動く
+		MoveUpDown, // 上下に動く
+		Rotate      // 回転する
 	};
 
 public:

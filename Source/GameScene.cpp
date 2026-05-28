@@ -64,17 +64,17 @@ void GameScene::Initialize()
 	Master::mpCamera->Reset();
 	Master::mpCamera->SetTitleMode(false);
 
-	//// SkyBox
-	//if (Master::mnSkyModelHandle != -1)
-	//{
-	//	auto* sky = new SkyBox(Master::mnSkyModelHandle);
-	//	sky->SetScale(10.0f);
-	//}
-	//else
-	//{
-	//	auto* sky = new SkyBox("Resource/3D/SkyBox/sky.mqo");
-	//	sky->SetScale(10.0f);
-	//}
+	// SkyBox
+	if (Master::mnSkyModelHandle != -1)
+	{
+		auto* sky = new SkyBox(Master::mnSkyModelHandle);
+		sky->SetScale(12.0f);
+	}
+	else
+	{
+		auto* sky = new SkyBox("Resource/3D/SkyBox/sky.mqo");
+		sky->SetScale(12.0f);
+	}
 
 	// Player
 	Player3D* player = new Player3D(VGet(0, 100, 0), "Resource/3D/Player/octopus.mqo");
@@ -119,9 +119,6 @@ void GameScene::Initialize()
 		5.0f
 	);
 
-	Stage* sss = new Stage("Resource/3D/Stage1/sss.mqo", "Resource/3D/Stage1/sss.mqo", Stage::StageType::Moving);
-	sss->SetScale(5.0f);
-
 	//// 移動ステージ
 	//CreateStage(
 	//	Master::mnStageMoveHandle,
@@ -129,7 +126,7 @@ void GameScene::Initialize()
 	//	"Resource/3D/Stage1/moveStage.mqo",
 	//	"Resource/3D/Stage1/moveStageColl.mqo",
 	//	5.0f,
-	//	Stage::StageType::Moving
+	//	Stage::StageType::MoveSide
 	//);
 
 	//// 回転ステージ
@@ -139,7 +136,7 @@ void GameScene::Initialize()
 	//	"Resource/3D/Stage1/rotaStage.mqo",
 	//	"Resource/3D/Stage1/rotaStageColl.mqo",
 	//	5.0f,
-	//	Stage::StageType::Rotating
+	//	Stage::StageType::MoveUpDown
 	//);
 
 	//// 小回転ステージ
@@ -149,8 +146,17 @@ void GameScene::Initialize()
 	//	"Resource/3D/Stage1/littleRota.mqo",
 	//	"Resource/3D/Stage1/littleRotaColl.mqo",
 	//	5.0f,
-	//	Stage::StageType::LittleRotation
+	//	Stage::StageType::Rotate
 	//);
+
+
+   // ------ フォグ設定 ------
+	SetFogEnable(TRUE); // フォグ有効
+	SetFogMode(DX_FOGMODE_LINEAR); // 線形フォグ
+	SetFogStartEnd(7500.0f, 14000.0f); // 開始距離と終了距離
+	SetFogColor(255, 150, 80);
+	SetFogDensity(0.001f);
+
 }
 
 
