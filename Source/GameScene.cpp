@@ -110,7 +110,7 @@ void GameScene::Initialize()
 		m_enemyList.push_back(enemy);
 	}
 
-	// Stage
+	// 土台ステージ
 	CreateStage(
 		Master::mnStageModelHandle,
 		Master::mnStageCollisionHandle,
@@ -119,35 +119,35 @@ void GameScene::Initialize()
 		5.0f
 	);
 
-	//// 移動ステージ
-	//CreateStage(
-	//	Master::mnStageMoveHandle,
-	//	Master::mnStageMoveCollHandle,
-	//	"Resource/3D/Stage1/moveStage.mqo",
-	//	"Resource/3D/Stage1/moveStageColl.mqo",
-	//	5.0f,
-	//	Stage::StageType::MoveSide
-	//);
+	// 左右移動ステージ
+	CreateStage(
+		Master::mnSlideStageHandle,
+		Master::mnSlideStageCollHandle,
+		"Resource/3D/Stage1/slideStage.mqo",
+		"Resource/3D/Stage1/slideStage.mqo",
+		5.0f,
+		Stage::StageType::MoveSide
+	);
 
-	//// 回転ステージ
-	//CreateStage(
-	//	Master::mnStageRotaHandle,
-	//	Master::mnStageRotaCollHandle,
-	//	"Resource/3D/Stage1/rotaStage.mqo",
-	//	"Resource/3D/Stage1/rotaStageColl.mqo",
-	//	5.0f,
-	//	Stage::StageType::MoveUpDown
-	//);
+	// 上下移動ステージ
+	CreateStage(
+		Master::mnUpdownStageHandle,
+		Master::mnUpdownStageCollHandle,
+		"Resource/3D/Stage1/updownStage.mqo",
+		"Resource/3D/Stage1/updownStage.mqo",
+		5.0f,
+		Stage::StageType::MoveUpDown
+	);
 
-	//// 小回転ステージ
-	//CreateStage(
-	//	Master::mnStageLittleRotaHandle,
-	//	Master::mnStageLittleCollRotaHandle,
-	//	"Resource/3D/Stage1/littleRota.mqo",
-	//	"Resource/3D/Stage1/littleRotaColl.mqo",
-	//	5.0f,
-	//	Stage::StageType::Rotate
-	//);
+	// 回転ステージ
+	CreateStage(
+		Master::mnRotaStageHandle,
+		Master::mnRotaStageCollHandle,
+		"Resource/3D/Stage1/rotaStage.mqo",
+		"Resource/3D/Stage1/rotaStage.mqo",
+		5.0f,
+		Stage::StageType::Rotate
+	);
 
 
    // ------ フォグ設定 ------

@@ -24,12 +24,12 @@ public:
 	static int mnStageCollisionHandle;  // ステージの当たり判定用コリジョンモデル
 
 	// ステージの動きに合わせて共有するハンドル
-	static int mnStageMoveHandle;        // 移動ステージ用
-	static int mnStageMoveCollHandle;        // 移動ステージ用当たり判定用コリジョンモデル
-	static int mnStageRotaHandle;        // 回転ステージ用
-	static int mnStageRotaCollHandle;        // 回転ステージ用当たり判定用コリジョンモデル
-	static int mnStageLittleRotaHandle;  // 微回転ステージ用
-	static int mnStageLittleCollRotaHandle;  // 微回転ステージ用当たり判定用コリジョンモデル
+	static int mnSlideStageHandle;			  // 移動ステージ用
+	static int mnSlideStageCollHandle;         // 移動ステージ用当たり判定用コリジョンモデル
+	static int mnUpdownStageHandle;			  // 回転ステージ用
+	static int mnUpdownStageCollHandle;         // 回転ステージ用当たり判定用コリジョンモデル
+	static int mnRotaStageHandle;       // 微回転ステージ用
+	static int mnRotaStageCollHandle;   // 微回転ステージ用当たり判定用コリジョンモデル
 };
 
 //float scale = 2.3f; // ステージの拡大率

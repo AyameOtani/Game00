@@ -16,14 +16,28 @@ int Master::mnStageModelHandle = -1;
 int Master::mnStageCollisionHandle = -1;
 
 
-int Master::mnStageMoveHandle = -1;
-int Master::mnStageMoveCollHandle = -1;
-int Master::mnStageRotaHandle = -1;
-int Master::mnStageRotaCollHandle = -1;
-int Master::mnStageLittleRotaHandle = -1;
-int Master::mnStageLittleCollRotaHandle = -1;
+int Master::mnSlideStageHandle = -1;
+int Master::mnSlideStageCollHandle = -1;
+int Master::mnUpdownStageHandle = -1;
+int Master::mnUpdownStageCollHandle = -1;
+int Master::mnRotaStageHandle = -1;
+int Master::mnRotaStageCollHandle = -1;
 
 
 
 
+// ロード対象ファイル
+static const char* kSkyModelPath = "Resource/3D/SkyBox/sky.mqo";
+
+static const char* kStageModelPath = "Resource/3D/Stage1/stage.mqo";
+static const char* kStageCollisionPath = "Resource/3D/Stage1/stage.mqo";
+
+static const char* kSlideStagePath = "Resource/3D/Stage1/slideStage.mqo";
+static const char* kSlideStageCollPath = "Resource/3D/Stage1/slideStage.mqo";
+
+static const char* kUpdownStagePath = "Resource/3D/Stage1/rotaStage.mqo";
+static const char* kUpdownStageCollPath = "Resource/3D/Stage1/rotaStage.mqo";
+
+static const char* kRotaStagePath = "Resource/3D/Stage1/littleRota.mqo";
+static const char* kRotaStageCollPath = "Resource/3D/Stage1/littleRota.mqo";
 

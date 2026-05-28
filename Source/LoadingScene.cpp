@@ -10,14 +10,14 @@ static const char* kSkyModelPath = "Resource/3D/SkyBox/sky.mqo";
 static const char* kStageModelPath = "Resource/3D/Stage1/stage.mqo";
 static const char* kStageCollisionPath = "Resource/3D/Stage1/stage.mqo";
 
-static const char* kMoveStagePath = "Resource/3D/Stage1/moveStage.mqo";
-static const char* kMoveStageCollPath = "Resource/3D/Stage1/moveStage.mqo";
+static const char* kSlideStagePath = "Resource/3D/Stage1/slideStage.mqo";
+static const char* kSlideStageCollPath = "Resource/3D/Stage1/slideStage.mqo";
 
-static const char* kRotaStagePath = "Resource/3D/Stage1/rotaStage.mqo";
-static const char* kRotaStageCollPath = "Resource/3D/Stage1/rotaStage.mqo";
+static const char* kUpdownStagePath = "Resource/3D/Stage1/rotaStage.mqo";
+static const char* kUpdownStageCollPath = "Resource/3D/Stage1/rotaStage.mqo";
 
-static const char* kLittleRotaStagePath = "Resource/3D/Stage1/littleRota.mqo";
-static const char* kLittleRotaCollPath = "Resource/3D/Stage1/littleRota.mqo";
+static const char* kRotaStagePath = "Resource/3D/Stage1/littleRota.mqo";
+static const char* kRotaStageCollPath = "Resource/3D/Stage1/littleRota.mqo";
 
 LoadingScene::LoadingScene()
 	: mbLoaded(false)
@@ -81,47 +81,47 @@ void LoadingScene::Update()
 	}
 	else if (mnProgressCounter == 3)
 	{
-		if (Master::mnStageMoveHandle == -1)
-			Master::mnStageMoveHandle = MV1LoadModel(kMoveStagePath);
+		if (Master::mnSlideStageHandle == -1)
+			Master::mnSlideStageHandle = MV1LoadModel(kSlideStagePath);
 	}
 	else if (mnProgressCounter == 4)
 	{
-		if (Master::mnStageMoveCollHandle == -1)
+		if (Master::mnSlideStageCollHandle == -1)
 		{
-			Master::mnStageMoveCollHandle = MV1LoadModel(kMoveStageCollPath);
+			Master::mnSlideStageCollHandle = MV1LoadModel(kSlideStageCollPath);
 
-			if (Master::mnStageMoveCollHandle != -1)
-				MV1SetupCollInfo(Master::mnStageMoveCollHandle, -1);
+			if (Master::mnSlideStageCollHandle != -1)
+				MV1SetupCollInfo(Master::mnSlideStageCollHandle, -1);
 		}
 	}
 	else if (mnProgressCounter == 5)
 	{
-		if (Master::mnStageRotaHandle == -1)
-			Master::mnStageRotaHandle = MV1LoadModel(kRotaStagePath);
+		if (Master::mnUpdownStageHandle == -1)
+			Master::mnUpdownStageHandle = MV1LoadModel(kUpdownStagePath);
 	}
 	else if (mnProgressCounter == 6)
 	{
-		if (Master::mnStageRotaCollHandle == -1)
+		if (Master::mnUpdownStageCollHandle == -1)
 		{
-			Master::mnStageRotaCollHandle = MV1LoadModel(kRotaStageCollPath);
+			Master::mnUpdownStageCollHandle = MV1LoadModel(kUpdownStageCollPath);
 
-			if (Master::mnStageRotaCollHandle != -1)
-				MV1SetupCollInfo(Master::mnStageRotaCollHandle, -1);
+			if (Master::mnUpdownStageCollHandle != -1)
+				MV1SetupCollInfo(Master::mnUpdownStageCollHandle, -1);
 		}
 	}
 	else if (mnProgressCounter == 7)
 	{
-		if (Master::mnStageLittleRotaHandle == -1)
-			Master::mnStageLittleRotaHandle = MV1LoadModel(kLittleRotaStagePath);
+		if (Master::mnRotaStageHandle == -1)
+			Master::mnRotaStageHandle = MV1LoadModel(kRotaStagePath);
 	}
 	else if (mnProgressCounter == 8)
 	{
-		if (Master::mnStageLittleCollRotaHandle == -1)
+		if (Master::mnRotaStageCollHandle == -1)
 		{
-			Master::mnStageLittleCollRotaHandle = MV1LoadModel(kLittleRotaCollPath);
+			Master::mnRotaStageCollHandle = MV1LoadModel(kRotaStageCollPath);
 
-			if (Master::mnStageLittleCollRotaHandle != -1)
-				MV1SetupCollInfo(Master::mnStageLittleCollRotaHandle, -1);
+			if (Master::mnRotaStageCollHandle != -1)
+				MV1SetupCollInfo(Master::mnRotaStageCollHandle, -1);
 		}
 	}
 
