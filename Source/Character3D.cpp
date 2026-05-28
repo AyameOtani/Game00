@@ -121,6 +121,8 @@ void Character3D::ResolveCollision3D()
 	// 接地したステージの移動量を保持する変数
 	VECTOR totalMoveDelta = VGet(0, 0, 0);
 	bool isGroundedStageFound = false;
+	// 接地しているステージを覚えておく箱
+	Stage* pGroundedStage = nullptr;
 
 	// 足元・床検出用のサンプルオフセット（5点チェック）
 	const float step = m_floorLinePos;
@@ -257,6 +259,9 @@ void Character3D::ResolveCollision3D()
 					totalMoveDelta = pStage->GetPositionDelta();
 					isGroundedStageFound = true;
 
+					// ★ここに追加：今見つかったステージ（pStage）を箱に入れておく
+					pGroundedStage = pStage;
+
 					VECTOR tmpNormal;
 					if (pStage->CheckHit_Line_Normal(start, end, tmpNormal))
 					{
@@ -342,20 +347,54 @@ void Character3D::ResolveCollision3D()
 				SyncModel();
 			}
 
+			//if (floorNormal.y < 0.95f)
+			//{
+			//	VECTOR downDir = VGet(0.0f, -1.0f, 0.0f);
+
+			//	float dot = VDot(downDir, floorNormal);
+			//	VECTOR slideDir = VSub(downDir, VScale(floorNormal, dot));
+
+			//	if (VSize(slideDir) > 0.0001f)
+			//	{
+			//		slideDir = VNorm(slideDir);
+
+			//		float slideStrength = (1.0f - floorNormal.y) * 30.0f;
+			//		if (slideStrength > 50.0f) slideStrength = 50.0f;
+
+			//		mvPosition = VAdd(mvPosition, VScale(slideDir, slideStrength));
+			//	}
+			//}
+
+			// 床確定処理の最後の方にある滑り処理をこのように書き換えます
 			if (floorNormal.y < 0.95f)
 			{
 				VECTOR downDir = VGet(0.0f, -1.0f, 0.0f);
-
 				float dot = VDot(downDir, floorNormal);
 				VECTOR slideDir = VSub(downDir, VScale(floorNormal, dot));
 
 				if (VSize(slideDir) > 0.0001f)
 				{
 					slideDir = VNorm(slideDir);
-
 					float slideStrength = (1.0f - floorNormal.y) * 30.0f;
-					if (slideStrength > 50.0f) slideStrength = 50.0f;
 
+					// ステージの種類に応じて滑りの強さを変える
+					if (isGroundedStageFound)
+					{
+						// 床のタイプを取得して、タイプごとの補正をかける
+						// ここで pStage は接地しているステージのポインタです
+						Stage::StageType type = pGroundedStage->GetType();
+
+						if (type == Stage::StageType::Rotate)
+						{
+							slideStrength *= 0.3f;
+						}
+						else if (type == Stage::StageType::MoveSide)
+						{
+							slideStrength *= 0.8f;
+						}
+					}
+
+					if (slideStrength > 50.0f) slideStrength = 50.0f;
 					mvPosition = VAdd(mvPosition, VScale(slideDir, slideStrength));
 				}
 			}

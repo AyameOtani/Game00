@@ -4,8 +4,9 @@
 #include "DxLib.h"
 
 // コンストラクタ（モデルファイル名を指定して生成する場合）
-Stage::Stage(std::string stageModelName, std::string stageCollisionModelName, StageType type)
-	: Object3D(VGet(0.0f, 0.0f, 0.0f))
+Stage::Stage(std::string stageModelName, std::string stageCollisionModelName, VECTOR iniPos, StageType type)
+	: Object3D(iniPos)
+	, m_iniPos(iniPos)
 	, mnModelHandle(MV1LoadModel(stageModelName.c_str()))
 	, mnCollisionHandle(MV1LoadModel(stageCollisionModelName.c_str()))
 	, m_type(type)
@@ -14,6 +15,10 @@ Stage::Stage(std::string stageModelName, std::string stageCollisionModelName, St
 	, mfMoveTime(0.0f)
 	, mfRotation(0.0f)
 	, mbRota(false)
+	, m_originPos(VGet(0.0f, 0.0f, 0.0f))
+	, m_rotatePivot(iniPos) // デフォルト値
+	, m_rotateSpeed(1.1f)
+	, m_rotateRange(0.15f)
 {
 	SetTag(Object3D::T_Stage3D);
 
@@ -27,11 +32,15 @@ Stage::Stage(std::string stageModelName, std::string stageCollisionModelName, St
 	m_prevRotation = VGet(0, 0, 0);
 	m_posDelta = VGet(0, 0, 0);
 	m_rotDelta = VGet(0, 0, 0);
+
+	mvPosition = iniPos;
+	m_originPos = iniPos;   // 回転用の基準
 }
 
 // コンストラクタ（外部からハンドルを受け取って生成する場合）
-Stage::Stage(int modelHandle, int collisionHandle, StageType type)
-	: Object3D(VGet(0.0f, 0.0f, 0.0f))
+Stage::Stage(int modelHandle, int collisionHandle, VECTOR iniPos, StageType type)
+	: Object3D(iniPos)
+	, m_iniPos(iniPos)
 	, mnModelHandle(modelHandle)
 	, mnCollisionHandle(collisionHandle)
 	, m_type(type)
@@ -40,6 +49,11 @@ Stage::Stage(int modelHandle, int collisionHandle, StageType type)
 	, mfMoveTime(0.0f)
 	, mfRotation(0.0f)
 	, mbRota(false)
+	, m_originPos(VGet(0.0f, 0.0f, 0.0f))
+	, m_rotatePivot(iniPos) // デフォルト値
+	, m_rotateSpeed(1.1f)
+	, m_rotateRange(0.15f)
+
 {
 	SetTag(Object3D::T_Stage3D);
 
@@ -47,6 +61,9 @@ Stage::Stage(int modelHandle, int collisionHandle, StageType type)
 	{
 		MV1SetupCollInfo(mnCollisionHandle, -1);
 	}
+
+	mvPosition = iniPos;   // ★これ絶対入れる
+	m_originPos = iniPos;   // ★回転用の基準もここ
 }
 
 // デストラクタ
@@ -84,15 +101,39 @@ void Stage::Update()
 
 	case StageType::MoveUpDown:
 		// 上下：mfMoveTime に 1.5 を掛けて速度を1.5倍にしました
-		mvPosition.y = sinf(mfMoveTime * 1.5f) * 400.0f;
+		mvPosition.y = sinf(mfMoveTime * 1.5f) * 200.0f;
 		break;
+
 
 	case StageType::Rotate:
 	{
-		// 回転：mfMoveTime に掛ける値を 0.7 から 2.0 に増やして高速化し、
-		// 傾きの大きさ（0.05f）も増やして大きく回転するようにしました
-		float tilt = sinf(mfMoveTime * 2.0f) * 0.2f;
-		mvRotation.z = tilt;
+		float angle = sinf(mfMoveTime * m_rotateSpeed) * m_rotateRange;
+		float s = sinf(angle);
+		float c = cosf(angle);
+
+		// 回転軸に応じた座標変換
+		if (m_rotateAxis == RotateAxis::Z)
+		{
+			// ★修正点: m_originPos ではなく m_iniPos を使う
+			float dx = m_iniPos.x - m_rotatePivot.x;
+			float dy = m_iniPos.y - m_rotatePivot.y;
+
+
+
+			mvPosition.x = m_rotatePivot.x + dx * c - dy * s;
+			mvPosition.y = m_rotatePivot.y + dx * s + dy * c;
+			mvRotation.z = angle;
+		}
+		else // RotateAxis::X
+		{
+			// ★修正点: m_originPos ではなく m_iniPos を使う
+			float dy = m_iniPos.y - m_rotatePivot.y;
+			float dz = m_iniPos.z - m_rotatePivot.z;
+
+			mvPosition.y = m_rotatePivot.y + dy * c - dz * s;
+			mvPosition.z = m_rotatePivot.z + dy * s + dz * c;
+			mvRotation.x = angle;
+		}
 	}
 	break;
 
@@ -117,11 +158,15 @@ void Stage::Update()
 		MV1RefreshCollInfo(mnCollisionHandle);
 	}
 
+
 	// プレイヤーとかも一緒に動かすための位置
 	m_posDelta = VSub(mvPosition, m_prevPosition);
 	m_rotDelta = VSub(mvRotation, m_prevRotation);
 	m_prevPosition = mvPosition;
 	m_prevRotation = mvRotation;
+
+	//DrawLine3D(m_rotatePivot, mvPosition, GetColor(255, 255, 0)); // 軸から現在位置へ黄色い線を引く
+	//DrawSphere3D(m_rotatePivot, 10.0f, 10, GetColor(255, 0, 0), GetColor(255, 0, 0), true); // 軸点を赤玉で表示
 }
 
 // 描画処理
@@ -233,4 +278,13 @@ void Stage::TitleRotate()
 int Stage::GetModelHandle() const
 {
 	return mnCollisionHandle;
+}
+
+// Stage.cpp
+
+void Stage::SetRotateParam(float speed, float range, RotateAxis axis)
+{
+	m_rotateSpeed = speed;
+	m_rotateRange = range;
+	m_rotateAxis = axis; // 軸を保存
 }

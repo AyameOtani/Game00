@@ -19,17 +19,18 @@ namespace
 		const char* modelPath,
 		const char* collPath,
 		float scale,
+		VECTOR pos,
 		Stage::StageType type = Stage::StageType::Static)
 	{
 		Stage* stage = nullptr;
 
 		if (modelHandle != -1 && collHandle != -1)
 		{
-			stage = new Stage(modelHandle, collHandle, type);
+			stage = new Stage(modelHandle, collHandle, pos, type);
 		}
 		else
 		{
-			stage = new Stage(modelPath, collPath, type);
+			stage = new Stage(modelPath, collPath, pos, type);
 		}
 
 		stage->SetScale(scale);
@@ -116,7 +117,9 @@ void GameScene::Initialize()
 		Master::mnStageCollisionHandle,
 		"Resource/3D/Stage1/stage.mqo",
 		"Resource/3D/Stage1/stageColl.mqo",
-		5.0f
+		5.0f,
+		VGet(0.0f, 0.0f, 0.0f),
+		Stage::StageType::Static
 	);
 
 	// 左右移動ステージ
@@ -126,6 +129,7 @@ void GameScene::Initialize()
 		"Resource/3D/Stage1/slideStage.mqo",
 		"Resource/3D/Stage1/slideStage.mqo",
 		5.0f,
+		VGet(0.0f, 0.0f, 0.0f),
 		Stage::StageType::MoveSide
 	);
 
@@ -136,17 +140,49 @@ void GameScene::Initialize()
 		"Resource/3D/Stage1/updownStage.mqo",
 		"Resource/3D/Stage1/updownStage.mqo",
 		5.0f,
+		VGet(0.0f, 0.0f, 0.0f),
 		Stage::StageType::MoveUpDown
 	);
 
 	// 回転ステージ
-	CreateStage(
+	Stage* rotaBase = CreateStage(
 		Master::mnRotaStageHandle,
 		Master::mnRotaStageCollHandle,
 		"Resource/3D/Stage1/rotaStage.mqo",
 		"Resource/3D/Stage1/rotaStage.mqo",
 		5.0f,
+		VGet(4500.0f, 1520.0f, 6877.0f),
 		Stage::StageType::Rotate
+	);
+	rotaBase->SetRotateParam(
+		1.1f,                            // speed
+		0.18f,                           // range
+		Stage::RotateAxis::Z             // 軸
+	);
+
+
+
+	// でかめの床	   手前
+	Stage* rota1 = new Stage("Resource/3D/Stage1/rotaStage1.mqo", "Resource/3D/Stage1/rotaStage1.mqo"
+		, VGet(7605.0f, 600.0f, 3800.0f),Stage::StageType::Rotate);
+	rota1->SetScale(5.0f);
+
+	rota1->SetRotateParam(
+		2.7f,                            // speed
+		0.2f,                           // range
+		Stage::RotateAxis::X             // 軸
+	);
+
+
+	// でかめの床	   奥
+	Stage* rota2 = new Stage("Resource/3D/Stage1/rotaStage2.mqo", "Resource/3D/Stage1/rotaStage2.mqo"
+		, VGet(7605.0f, 600.0f, 3800.0f),Stage::StageType::Rotate);
+	rota2->SetScale(5.0f);
+
+	rota2->SetRotateParam(
+		1.3f,                            // speed
+		0.40f,                           // range
+		Stage::RotateAxis::X             // 軸
 	);
 
 
