@@ -41,53 +41,55 @@ public:
 	void SetFloorLinePos(float v) { m_floorLinePos = v; }
 
 protected:
+
 	// 基本ステータス
-	int m_maxHp;
-	int m_hp;
-	Team m_team;
+	int m_maxHp;                  // HP最大値
+	int m_hp;                     // 現在HP
+	Team m_team;                  // チーム（Player / Enemyなど）
 
 	// 共通の当たり判定半径（床・壁用）
-	float m_radius;
+	float m_radius;               // キャラ本体の当たり半径
 
-	// 天井専用の当たり判定半径（m_radius と別にする）
-	float m_ceilRadius;
+	// 天井専用の当たり判定半径
+	float m_ceilRadius;           // 天井判定専用半径（床と分離）
 
 	// 床判定用パラメータ
-	float m_floorCapsuleMinY;
-	float m_floorCapsuleMaxY;
-	float m_floorLinePos;
-	float m_floorLineMinY;
-	float m_floorLineMaxY;
+	float m_floorCapsuleMinY;     // 床判定カプセル下端Y
+	float m_floorCapsuleMaxY;     // 床判定カプセル上端Y
+	float m_floorLinePos;         // 床判定の横サンプル距離
+	float m_floorLineMinY;        // 床レイ開始Y
+	float m_floorLineMaxY;        // 床レイ終了Y
 
 	// 壁判定用パラメータ
-	float m_wallCapsuleMinY;
-	float m_wallCapsuleMaxY;
+	float m_wallCapsuleMinY;      // 壁判定カプセル下端Y
+	float m_wallCapsuleMaxY;      // 壁判定カプセル上端Y
 
 	// 天井判定用パラメータ
-	float m_ceilCapsuleMinY;
-	float m_ceilCapsuleMaxY;
-	float m_ceilLinePos;
-	float m_ceilLineMinY;
-	float m_ceilLineMaxY;
+	float m_ceilCapsuleMinY;      // 天井判定カプセル下端Y
+	float m_ceilCapsuleMaxY;      // 天井判定カプセル上端Y
+	float m_ceilLinePos;          // 天井判定横サンプル距離
+	float m_ceilLineMinY;         // 天井レイ開始Y
+	float m_ceilLineMaxY;         // 天井レイ終了Y
 
 	// 物理関連
-	VECTOR mvOldPosition;
-	VECTOR mvVelocity = VGet(0.0f, 0.0f, 0.0f);
-	float mfYVelocity = 0.0f;
-	bool mbIsGround = false;
-	bool mbJump = false;
-	bool mbFall = false;
-	float mfGroundY = -FLT_MAX;
+	VECTOR mvOldPosition;         // 前フレーム位置
+	VECTOR mvVelocity;            // 移動速度ベクトル
+	float mfYVelocity;            // Y方向速度（ジャンプ・落下）
+	bool mbIsGround;              // 接地フラグ
+	bool mbJump;                  // ジャンプ中フラグ
+	bool mbFall;                  // 落下中フラグ
+	float mfGroundY;              // 接地している地面Y（拡張用）
 
 	// 向き・運動パラメータ
-	float mfAngle = 0.0f;
-	float mfAccel = 40.0f;
-	float mfDecel = 80.0f;
-	float mfAirAccel = 5.0f;
-	float mfAirDecel = 10.0f;
+	float mfAngle;                // キャラの向き角度（ラジアン）
+	float mfAccel;                // 地上加速度
+	float mfDecel;                // 地上減速度
+	float mfAirAccel;             // 空中加速度
+	float mfAirDecel;             // 空中減速度
 
 	// ジャンプ・重力
-	float mfJumpPower = 30.0f;
-	float mfGravity = -1.2f;
-	float mfMaxFallSpeed = 60.0f;
+	float mfJumpPower;            // ジャンプ初速
+	float mfGravity;              // 重力加速度
+	float mfMaxFallSpeed;         // 最大落下速度
+
 };

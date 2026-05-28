@@ -32,7 +32,6 @@ public:
 	void SyncModel() override;
 
 public:
-	void OnDeath();            // 死亡時に呼ぶ
 	bool IsMarkedForDelete() const { return mbMarkedForDelete; }
 
 private:

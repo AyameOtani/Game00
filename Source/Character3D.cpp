@@ -10,25 +10,39 @@
 // コンストラクタ：当たり判定パラメータはデフォルト値を入れておく。
 // 派生クラス（Player3D / Enemy3D）はここを上書きして細かく調整する。
 Character3D::Character3D(VECTOR initPos, int maxHp, Team team, float radius)
-	: Object3D(initPos)
-	, m_maxHp(maxHp)
-	, m_hp(maxHp)
-	, m_team(team)
-	, m_radius(radius)
-	, m_ceilRadius(radius) // 天井判定用半径はデフォルトで床と同じにしておく
-	, m_floorCapsuleMinY(3.0f)
-	, m_floorCapsuleMaxY(40.0f)
-	, m_floorLinePos(25.0f)
-	, m_floorLineMinY(20.0f)
-	, m_floorLineMaxY(-300.0f)
-	, m_wallCapsuleMinY(10.0f)
-	, m_wallCapsuleMaxY(70.0f)
-	, m_ceilCapsuleMinY(60.0f)
-	, m_ceilCapsuleMaxY(80.0f)
-	, m_ceilLinePos(15.0f)
-	, m_ceilLineMinY(70.0f)
-	, m_ceilLineMaxY(100.0f)
-	, mvOldPosition(initPos)
+	: Object3D(initPos)                          // 親クラス初期化（位置）
+	, m_maxHp(maxHp)                             // 最大HP
+	, m_hp(maxHp)                                // 現在HP
+	, m_team(team)                               // チーム情報
+	, m_radius(radius)                           // 当たり判定半径
+	, m_ceilRadius(radius)                       // 天井判定半径（床と同じ）
+	, m_floorCapsuleMinY(3.0f)                   // 床カプセル下端
+	, m_floorCapsuleMaxY(40.0f)                  // 床カプセル上端
+	, m_floorLinePos(25.0f)                      // 床レイ横オフセット
+	, m_floorLineMinY(20.0f)                     // 床レイ開始Y
+	, m_floorLineMaxY(-300.0f)                   // 床レイ終了Y
+	, m_wallCapsuleMinY(10.0f)                   // 壁カプセル下端
+	, m_wallCapsuleMaxY(70.0f)                   // 壁カプセル上端
+	, m_ceilCapsuleMinY(60.0f)                   // 天井カプセル下端
+	, m_ceilCapsuleMaxY(80.0f)                   // 天井カプセル上端
+	, m_ceilLinePos(15.0f)                       // 天井レイ横オフセット
+	, m_ceilLineMinY(70.0f)                      // 天井レイ開始Y
+	, m_ceilLineMaxY(100.0f)                     // 天井レイ終了Y
+	, mvOldPosition(initPos)                     // 前フレーム位置
+	, mvVelocity(VGet(0.0f, 0.0f, 0.0f))         // 移動速度
+	, mfYVelocity(0.0f)                          // Y方向速度
+	, mbIsGround(false)                          // 接地フラグ
+	, mbJump(false)                              // ジャンプ中フラグ
+	, mbFall(false)                              // 落下中フラグ
+	, mfGroundY(-FLT_MAX)                        // 接地地面Y
+	, mfAngle(0.0f)                              // 向き角度
+	, mfAccel(40.0f)                             // 地上加速
+	, mfDecel(80.0f)                             // 地上減速
+	, mfAirAccel(5.0f)                           // 空中加速
+	, mfAirDecel(10.0f)                          // 空中減速
+	, mfJumpPower(30.0f)                         // ジャンプ力
+	, mfGravity(-1.2f)                           // 重力
+	, mfMaxFallSpeed(60.0f)                      // 最大落下速度
 {
 	// 初期化は最低限に留める（派生側でモデル等を初期化する）
 }
@@ -191,8 +205,8 @@ void Character3D::ResolveCollision3D()
 				// 半径よりもめり込んでいる分だけ、法線方向に押し出す
 				if (dist < m_radius)
 				{
-					float push = (m_radius - dist) + 0.01f; // わずかな余裕(0.1f)を持たせて押し出し
-					wallPos = VAdd(wallPos, VScale(VNorm(diff), push));
+					//float push = (m_radius - dist) + 0.01f; // わずかな余裕(0.1f)を持たせて押し出し
+					//wallPos = VAdd(wallPos, VScale(VNorm(diff), push));
 				}
 
 				hitWall = true; // 壁に衝突したのでフラグを立てる

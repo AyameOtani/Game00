@@ -60,7 +60,7 @@ void Player3D::Update()
 
 	if (CheckHitKey(KEY_INPUT_1))
 	{
-		mvPosition = VGet(0,0,0);
+		mvPosition = VGet(14000,3000,14000);
 		mfYVelocity = 0.0f;
 		mbIsGround = false;
 	}

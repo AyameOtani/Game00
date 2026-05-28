@@ -44,6 +44,8 @@ GameScene::GameScene()
 	: Scene()
 {
 	SetFontSize(60);
+
+	mnGoalHandle = LoadGraph("Resource/2D/Goal.png");
 }
 
 GameScene::~GameScene() {}
@@ -181,11 +183,16 @@ void GameScene::Update()
 
 		isAlive = true;
 
-		// 勝利条件
-		if (player->GetPosition().x > 15500.0f &&
-			player->GetPosition().y > 1050.0f &&
-			player->GetPosition().z > 14400.0f)
+
+		// ゴール判定 (球判定)
+		VECTOR playerPos = player->GetPosition();
+		VECTOR goalPos = VGet(15590.0f, 3000.0f, 14430.0f);
+		// プレイヤーとゴール間の距離を計算
+		float dist = VSize(VSub(playerPos, goalPos));
+
+		if (dist < mfGoalRadius)
 		{
+			// ゴール！
 			Master::mpSceneManager->SetNextScene(SceneManager::SCENE_TYPE::WIN_RESULT_3D);
 			return;
 		}
@@ -267,6 +274,17 @@ void GameScene::Draw()
 		m_selectedId,
 		(int)m_enemyList.size() - 1
 	);
+
+
+	// --- ゴールに画像を表示 ---
+	VECTOR goalPos = VGet(15590.0f, 3100.0f, 14430.0f);
+	// DrawBillboard3D で描画
+	// Pos:座標, cx/cy:中心点(0.5で中央), Size:大きさ, Angle:回転, Handle, TransFlag
+	DrawBillboard3D(goalPos, 0.5f, 0.5f, 800.0f, 0.0f, mnGoalHandle, TRUE);
+
+	// goalのあたり判定デバッグ用
+	DrawSphere3D(goalPos, mfGoalRadius, 16, GetColor(0, 255, 0), GetColor(0, 255, 0), FALSE);
+
 
 	Scene::Draw();
 }

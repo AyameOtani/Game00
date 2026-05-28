@@ -32,12 +32,13 @@ private:
     int m_selectedId = 0; // 今操作対象にしている敵のID
     std::vector<Enemy3D*> m_enemyList; // 敵の管理用
 
-private:
     std::vector<VECTOR> m_recordedEnemyPositions; // 記録用リスト
 
+    std::vector<EnemyData> m_savedEnemyList; // ファイル保存用のリスト
 
 private:
-    std::vector<EnemyData> m_savedEnemyList; // ファイル保存用のリスト
+	int mnGoalHandle = -1; // 画像ハンドル ゴールの画像
+	float mfGoalRadius = 300.0f; // ゴールの当たり判定用半径
 };
 
 
