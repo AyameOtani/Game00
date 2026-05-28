@@ -13,11 +13,11 @@ static const char* kStageCollisionPath = "Resource/3D/Stage1/stage.mqo";
 static const char* kSlideStagePath = "Resource/3D/Stage1/slideStage.mqo";
 static const char* kSlideStageCollPath = "Resource/3D/Stage1/slideStage.mqo";
 
-static const char* kUpdownStagePath = "Resource/3D/Stage1/rotaStage.mqo";
-static const char* kUpdownStageCollPath = "Resource/3D/Stage1/rotaStage.mqo";
+static const char* kUpdownStagePath = "Resource/3D/Stage1/updownStage.mqo";
+static const char* kUpdownStageCollPath = "Resource/3D/Stage1/updownStage.mqo";
 
-static const char* kRotaStagePath = "Resource/3D/Stage1/littleRota.mqo";
-static const char* kRotaStageCollPath = "Resource/3D/Stage1/littleRota.mqo";
+static const char* kRotaStagePath = "Resource/3D/Stage1/rotaStage.mqo";
+static const char* kRotaStageCollPath = "Resource/3D/Stage1/rotaStage.mqo";
 
 LoadingScene::LoadingScene()
 	: mbLoaded(false)

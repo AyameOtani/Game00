@@ -78,25 +78,23 @@ void Stage::Update()
 		break;
 
 	case StageType::MoveSide:
-		// 左右運動：正弦波（sin）を用いてX軸方向に往復移動させる
+		// 横：今のままで良いとのことでしたので維持します
 		mvPosition.x = sinf(mfMoveTime) * 300.0f;
 		break;
 
-
 	case StageType::MoveUpDown:
-		// 上下運動：正弦波（sin）を用いてY軸方向に往復移動させる
-		mvPosition.y = sinf(mfMoveTime) * 300.0f;
+		// 上下：mfMoveTime に 1.5 を掛けて速度を1.5倍にしました
+		mvPosition.y = sinf(mfMoveTime * 1.5f) * 400.0f;
 		break;
-
 
 	case StageType::Rotate:
-		{
-			// mfMoveTime に 0.7 を掛けて 揺れるスピードを少し遅くしている
-			// 0.8f は最大傾きの大きさ
-			float tilt = sinf(mfMoveTime * 0.7f) * 0.8f;
-			mvRotation.z = tilt;
-		}
-		break;
+	{
+		// 回転：mfMoveTime に掛ける値を 0.7 から 2.0 に増やして高速化し、
+		// 傾きの大きさ（0.05f）も増やして大きく回転するようにしました
+		float tilt = sinf(mfMoveTime * 2.0f) * 0.2f;
+		mvRotation.z = tilt;
+	}
+	break;
 
 
 	default:
