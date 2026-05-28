@@ -2,13 +2,13 @@ Metasequoia Document
 Format Text Ver 1.0
 
 Scene {
-	pos 1160.5869 -623.1646 5960.4644
+	pos 1160.5869 -623.1646 15258.7891
 	lookat 0.0000 0.0000 0.0000
-	head -199.5655
-	pich 0.3108
+	head -199.8056
+	pich 0.3808
 	bank -6.3100
 	ortho 0
-	zoom2 1.2583
+	zoom2 0.4915
 	amb 0.250 0.250 0.250
 	dirlights 1 {
 		light {
@@ -39,7 +39,7 @@ Object "stick" {
 	rotation 0.000000 0.000000 0.000000
 	translation 0.000000 0.000000 0.000000
 	visible 15
-	locking 1
+	locking 0
 	shading 1
 	facet 59.5
 	color 0.898 0.498 0.698
@@ -94,7 +94,7 @@ Object "mini" {
 	rotation 0.000000 -0.000000 0.000000
 	translation 0.000000 0.000000 0.000000
 	visible 15
-	locking 1
+	locking 0
 	shading 1
 	facet 59.5
 	color 0.898 0.498 0.698
@@ -153,7 +153,7 @@ Object "frying pan" {
 	rotation 0.000000 0.000000 0.000000
 	translation 0.000000 0.000000 0.000000
 	visible 15
-	locking 1
+	locking 0
 	shading 1
 	facet 59.5
 	color 0.898 0.498 0.698
@@ -418,7 +418,7 @@ Object "goal" {
 	rotation 0.000000 -0.000000 0.000000
 	translation 0.000000 0.000000 0.000000
 	visible 15
-	locking 1
+	locking 0
 	shading 1
 	facet 59.5
 	color 0.898 0.498 0.698
@@ -449,7 +449,7 @@ Object "Paul" {
 	rotation 0.000000 0.000000 0.000000
 	translation 0.000000 0.000000 0.000000
 	visible 15
-	locking 1
+	locking 0
 	shading 1
 	facet 59.5
 	color 0.898 0.498 0.698
@@ -698,7 +698,7 @@ Object "launch" {
 	rotation 0.000000 0.000000 0.000000
 	translation 0.000000 0.000000 0.000000
 	visible 15
-	locking 1
+	locking 0
 	shading 1
 	facet 59.5
 	color 0.898 0.498 0.698
@@ -1003,7 +1003,7 @@ Object "Textureboard" {
 	rotation 0.000000 0.000000 0.000000
 	translation 0.000000 0.000000 0.000000
 	visible 15
-	locking 1
+	locking 0
 	shading 1
 	facet 59.5
 	color 0.898 0.498 0.698
@@ -1025,7 +1025,7 @@ Object "Box" {
 	rotation 0.000000 0.000000 0.000000
 	translation 0.000000 0.000000 0.000000
 	visible 15
-	locking 1
+	locking 0
 	shading 1
 	facet 59.5
 	color 0.898 0.498 0.698
@@ -1326,7 +1326,7 @@ Object "Box01" {
 	rotation 0.000000 -0.000000 0.000000
 	translation 0.000000 0.000000 0.000000
 	visible 15
-	locking 1
+	locking 0
 	shading 1
 	facet 59.5
 	color 0.898 0.498 0.698
@@ -1523,7 +1523,7 @@ Object "board" {
 	rotation 0.000000 -0.000000 0.000000
 	translation 0.000000 0.000000 0.000000
 	visible 15
-	locking 1
+	locking 0
 	shading 1
 	facet 59.5
 	color 0.898 0.498 0.698
@@ -1554,7 +1554,7 @@ Object "board01" {
 	rotation 0.000000 -0.000000 0.000000
 	translation 0.000000 0.000000 0.000000
 	visible 15
-	locking 1
+	locking 0
 	shading 1
 	facet 59.5
 	color 0.898 0.498 0.698
@@ -1613,7 +1613,7 @@ Object "mini01" {
 	rotation 0.000000 -0.000000 0.000000
 	translation 0.000000 0.000000 0.000000
 	visible 15
-	locking 1
+	locking 0
 	shading 1
 	facet 59.5
 	color 0.898 0.498 0.698
@@ -1714,7 +1714,7 @@ Object "board02" {
 	rotation 0.000000 -0.000000 0.000000
 	translation 0.000000 0.000000 0.000000
 	visible 15
-	locking 1
+	locking 0
 	shading 1
 	facet 59.5
 	color 0.898 0.498 0.698
@@ -1759,7 +1759,7 @@ Object "mini02" {
 	rotation 0.000000 -0.000000 0.000000
 	translation 0.000000 0.000000 0.000000
 	visible 15
-	locking 1
+	locking 0
 	shading 1
 	facet 59.5
 	color 0.898 0.498 0.698
@@ -1832,7 +1832,7 @@ Object "Box02" {
 	rotation 0.000000 -0.000000 0.000000
 	translation 0.000000 0.000000 0.000000
 	visible 15
-	locking 1
+	locking 0
 	shading 1
 	facet 59.5
 	color 0.898 0.498 0.698
