@@ -249,8 +249,6 @@ void GameScene::Update()
 		return;
 	}
 
-	SaveEnemyDataToFile(); // 位置をファイル保存デバッグで使用した
-
 	Scene::Update();
 }
 
@@ -316,29 +314,6 @@ void GameScene::Finalize()
 		Master::mpCamera->Reset();
 	}
 }
-
-
-// 敵データ保存
-void GameScene::SaveEnemyDataToFile()
-{
-	// 保存するtxt名前
-	std::ofstream ofs("EnemyPlacement.txt");
-	if (!ofs) return;
-
-	// 順に入力
-	for (auto& d : m_savedEnemyList)
-	{
-		ofs << "ID: " << d.id
-			<< " Pos: "
-			<< d.pos.x << ", "
-			<< d.pos.y << ", "
-			<< d.pos.z
-			<< std::endl;
-	}
-}
-
-
-
 
 
 

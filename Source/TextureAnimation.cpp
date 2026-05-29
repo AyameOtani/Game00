@@ -83,5 +83,6 @@ void TextureAnimation::Draw()// 描画
 	// ここをcenterPositionにすれば良い
 	// このままだと、左上中心でそこから半径分となってしまっている
 	// これをcenterPositionにすると、真ん中の座標から半径分になるので判定が正しくなる
-	DrawGraph(mvPosition.x - (mnxNum / 2), mvPosition.y - (mnyNum / 2), mnHandleList[mnCurrentNum], true);
+	//DrawGraph(mvPosition.x - (mnxNum / 2), mvPosition.y - (mnyNum / 2), mnHandleList[mnCurrentNum], true);
+	DrawGraph((int)(mvPosition.x - (mnxNum / 2.0f)), (int)(mvPosition.y - (mnyNum / 2.0f)), mnHandleList[mnCurrentNum], true);
 }

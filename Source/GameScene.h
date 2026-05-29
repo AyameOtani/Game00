@@ -23,10 +23,6 @@ public:
     void Draw() override;        // 描画
     void Finalize() override;    // 終了
 
-    void SaveEnemyDataToFile();
-
-    Enemy3D::EnemyType GetEnemyTypeFromID(int id);
-
     struct EnemySpawnData
     {
         VECTOR pos;

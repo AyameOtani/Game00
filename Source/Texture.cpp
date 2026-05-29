@@ -30,7 +30,8 @@ void Texture::Draw()
 {
 	// 画像の表示    ここは画像の左上を中心としているので真ん中に表示されない。
 	// なので ｛- (mnSizeX / 2)｝を追加して、割る２して中心をもとめて真ん中と真ん中を合わせて描画している
-	DrawGraph(mvPosition.x - (mnSizeX / 2), mvPosition.y - (mnSizeY / 2), mnHandle, mnTransFlag);
+	//DrawGraph(mvPosition.x - (mnSizeX / 2), mvPosition.y - (mnSizeY / 2), mnHandle, mnTransFlag);
+	DrawGraph((int)(mvPosition.x - (mnSizeX / 2.0f)), (int)(mvPosition.y - (mnSizeY / 2.0f)), mnHandle, mnTransFlag);
 
 }
 
