@@ -31,13 +31,3 @@ public:
 	static int mnRotaStageHandle;       // 微回転ステージ用
 	static int mnRotaStageCollHandle;   // 微回転ステージ用当たり判定用コリジョンモデル
 };
-
-//float scale = 2.3f; // ステージの拡大率
-//Stage* stage = new Stage ("Resource/3D/Stage1/stage.mqo", "Resource/3D/Stage1/stage.mqo");
-//Stage* moveStage = new Stage ("Resource/3D/Stage1/moveStage.mqo", "Resource/3D/Stage1/moveStage.mqo", Stage::StageType::Moving);
-//Stage* rotaStage = new Stage ("Resource/3D/Stage1/rotaStage.mqo", "Resource/3D/Stage1/rotaStage.mqo", Stage::StageType::Rotating);
-//Stage* littleRotaStage = new Stage ("Resource/3D/Stage1/littleRota.mqo", "Resource/3D/Stage1/littleRota.mqo", Stage::StageType::LittleRotation);
-//stage->SetScale(scale);
-//moveStage->SetScale(scale);
-//rotaStage->SetScale(scale);
-//littleRotaStage->SetScale(scale);

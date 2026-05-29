@@ -13,6 +13,7 @@
 
 namespace
 {
+	// 外部からハンドルが渡された場合は再利用し、なければファイルから新規読み込みを行うステージ生成ヘルパー
 	Stage* CreateStage(
 		int modelHandle,
 		int collHandle,
@@ -24,20 +25,22 @@ namespace
 	{
 		Stage* stage = nullptr;
 
+		// 既に読み込み済みのリソースがある場合はハンドルを使用してコンストラクト
 		if (modelHandle != -1 && collHandle != -1)
 		{
 			stage = new Stage(modelHandle, collHandle, pos, type);
 		}
+		// 未読み込みの場合はパスから新規ロード
 		else
 		{
 			stage = new Stage(modelPath, collPath, pos, type);
 		}
 
+		// ステージのサイズを一括適用
 		stage->SetScale(scale);
 		return stage;
 	}
 }
-
 //--------------------------------------------------
 // コンストラクタ
 //--------------------------------------------------

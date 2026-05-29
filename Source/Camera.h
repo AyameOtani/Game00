@@ -55,17 +55,17 @@ private:
 	Object3D* mpTarget; // カメラを向ける対象
 	Object3D* mpTargetEnemy; // カメラを向ける対象 追加
 
-	// 画面振れ
-	int mnShakeTime;
-	int mnShakeTimeCount;
+	// 画面揺れ用変数
+	int mnShakeTime;           // 揺れる合計時間
+	int mnShakeTimeCount;      // 現在の揺れカウント
 
-	float mfShakeAngle;
-	float mfShakeTimeCounter;
-	float mfShakeTime;
-	float mfShakeWidth;
-	float mfShakeAngleSpeed;
-	float mfStepTime;
-	VECTOR mvShakePosition;
+	float mfShakeAngle;        // 現在の揺れ角度
+	float mfShakeTimeCounter;  // 揺れ計算用タイマー
+	float mfShakeTime;         // 揺れの持続時間
+	float mfShakeWidth;        // 揺れの幅（強さ）
+	float mfShakeAngleSpeed;   // 揺れの速さ（回転速度）
+	float mfStepTime;          // 1フレームあたりの時間ステップ
+	VECTOR mvShakePosition;    // 揺れによる座標オフセット
 
 private:
 	float mfCameraSpeed = 4.0; // カメラが動く速さ

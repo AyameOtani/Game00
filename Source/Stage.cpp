@@ -53,8 +53,13 @@ Stage::Stage(int modelHandle, int collisionHandle, VECTOR iniPos, StageType type
 	, m_rotatePivot(iniPos) // デフォルト値
 	, m_rotateSpeed(1.1f)
 	, m_rotateRange(0.15f)
-
+	, m_prevPosition(VGet(0.0f, 0.0f, 0.0f))
+	, m_prevRotation(VGet(0.0f, 0.0f, 0.0f))
+	, m_posDelta(VGet(0.0f, 0.0f, 0.0f))
+	, m_rotDelta(VGet(0.0f, 0.0f, 0.0f))
 {
+
+
 	SetTag(Object3D::T_Stage3D);
 
 	if (mnCollisionHandle != -1)
@@ -80,53 +85,51 @@ Stage::~Stage()
 	}
 }
 
-// 更新処理
+// 毎フレーム更新
 void Stage::Update()
 {
 	TitleRotate();
 
+	// 時間を進めてアニメーション系の基準にする
+	// 固定増加なのでフレーム依存だが軽量処理前提
 	mfMoveTime += 0.016f;
 
-	// ステージのタイプに応じた挙動の切り替え
 	switch (m_type)
 	{
 	case StageType::Static:
-		// 静止
+		// 動かないステージは処理なし
 		break;
 
 	case StageType::MoveSide:
-		// 横：今のままで良いとのことでしたので維持します
+		// サイン波で左右移動（周期運動）
 		mvPosition.x = sinf(mfMoveTime) * 300.0f;
 		break;
 
 	case StageType::MoveUpDown:
-		// 上下：mfMoveTime に 1.5 を掛けて速度を1.5倍にしました
+		// 上下移動は少し速くしてテンポを変える
 		mvPosition.y = sinf(mfMoveTime * 1.5f) * 200.0f;
 		break;
 
-
 	case StageType::Rotate:
 	{
+		// 回転量はsinで往復させて自然な揺れを作る
 		float angle = sinf(mfMoveTime * m_rotateSpeed) * m_rotateRange;
 		float s = sinf(angle);
 		float c = cosf(angle);
 
-		// 回転軸に応じた座標変換
+		// 軸回転は「基準点からの相対位置」を回す必要がある
+		// これをやらないと位置ごと回転してしまう
 		if (m_rotateAxis == RotateAxis::Z)
 		{
-			// ★修正点: m_originPos ではなく m_iniPos を使う
 			float dx = m_iniPos.x - m_rotatePivot.x;
 			float dy = m_iniPos.y - m_rotatePivot.y;
-
-
 
 			mvPosition.x = m_rotatePivot.x + dx * c - dy * s;
 			mvPosition.y = m_rotatePivot.y + dx * s + dy * c;
 			mvRotation.z = angle;
 		}
-		else // RotateAxis::X
+		else
 		{
-			// ★修正点: m_originPos ではなく m_iniPos を使う
 			float dy = m_iniPos.y - m_rotatePivot.y;
 			float dz = m_iniPos.z - m_rotatePivot.z;
 
@@ -137,14 +140,14 @@ void Stage::Update()
 	}
 	break;
 
-
 	default:
-		// 未定義のタイプが指定された場合は静止状態する
+		// 想定外値でも落ちないよう安全側に戻す
 		m_type = StageType::Static;
 		break;
 	}
 
-	// モデル・コリジョンの位置と回転を更新
+	// モデルとコリジョンを同じ位置に同期
+	// ずれていると見た目と判定が乖離するため必須
 	if (mnModelHandle != -1)
 	{
 		MV1SetPosition(mnModelHandle, mvPosition);
@@ -154,19 +157,17 @@ void Stage::Update()
 	{
 		MV1SetPosition(mnCollisionHandle, mvPosition);
 		MV1SetRotationXYZ(mnCollisionHandle, mvRotation);
-		// コリジョン情報を最新の位置・回転に同期
+
+		// 回転・移動後はコリジョンの内部BVH更新が必要
 		MV1RefreshCollInfo(mnCollisionHandle);
 	}
 
-
-	// プレイヤーとかも一緒に動かすための位置
+	// 差分を保持（プレイヤーや敵をステージと一緒に動かす用途）
 	m_posDelta = VSub(mvPosition, m_prevPosition);
 	m_rotDelta = VSub(mvRotation, m_prevRotation);
+
 	m_prevPosition = mvPosition;
 	m_prevRotation = mvRotation;
-
-	//DrawLine3D(m_rotatePivot, mvPosition, GetColor(255, 255, 0)); // 軸から現在位置へ黄色い線を引く
-	//DrawSphere3D(m_rotatePivot, 10.0f, 10, GetColor(255, 0, 0), GetColor(255, 0, 0), true); // 軸点を赤玉で表示
 }
 
 // 描画処理

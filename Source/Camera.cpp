@@ -14,6 +14,19 @@ Camera::Camera()
 	, mvLookAtPosition(VGet(0.0f, 0.0f, 0.0f)) // カメラが見ている方向
 	, mpTarget(nullptr)                        // まずは空っぽ
 	, mpTargetEnemy(nullptr)                   // まずは空っぽ 敵追加 1117
+	// 画面揺れ用変数の初期化
+	, mnShakeTime(0)
+	, mnShakeTimeCount(0)
+	, mfShakeAngle(0.0f)
+	, mfShakeTimeCounter(0.0f)
+	, mfShakeTime(0.0f)
+	, mfShakeWidth(0.0f)
+	, mfShakeAngleSpeed(0.0f)
+	, mfStepTime(1.0f)
+	, mvShakePosition(VGet(0.0f, 0.0f, 0.0f))
+	// 制御フラグ・速度の初期化
+	, mbTitleMode(false)
+	, mbStop(false)
 {
 
 }

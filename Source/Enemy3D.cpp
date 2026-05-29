@@ -153,15 +153,15 @@ void Enemy3D::Draw()
 	// 共通デバッグ（Character3D::DebugDraw を利用）
 	//DebugDraw();
 
-	// 移動可能範囲の可視化（デバッグ用）
-	DrawSphere3D(
-		mvBasePosition,   // 中心（元の位置）
-		200.0f,            // 移動可能半径
-		16,
-		GetColor(0, 255, 0),
-		GetColor(0, 255, 0),
-		FALSE
-	);
+	//// 移動可能範囲の可視化（デバッグ用）
+	//DrawSphere3D(
+	//	mvBasePosition,   // 中心（元の位置）
+	//	200.0f,            // 移動可能半径
+	//	16,
+	//	GetColor(0, 255, 0),
+	//	GetColor(0, 255, 0),
+	//	FALSE
+	//);
 
 	Object3D::Draw();
 }
@@ -280,11 +280,13 @@ void Enemy3D::UpdateRunner()
 	// 一定時間ごとに新しい目標
 	if (mfMoveTimer <= 0.0f)
 	{
-		float angle = (float)(rand() % 360) * DX_PI / 180.0f;
+		// 180.0 を 180.0f に変更
+		float angle = (float)(rand() % 360) * (float)DX_PI / 180.0f;
+
 		float radius = (float)(rand() % 200);
 
-		mvTargetPosition.x = mvBasePosition.x + cosf(angle) * radius;
-		mvTargetPosition.z = mvBasePosition.z + sinf(angle) * radius;
+		mvTargetPosition.x = (float)(mvBasePosition.x + cosf(angle) * radius);
+		mvTargetPosition.z = (float)(mvBasePosition.z + sinf(angle) * radius);
 		mvTargetPosition.y = mvBasePosition.y;
 
 		mfMoveTimer = 120.0f;

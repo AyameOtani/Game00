@@ -34,6 +34,10 @@ LoadingScene::LoadingScene()
     : mnProgressCounter(0)
     , mMinWaitFrame(30)
 {
+	mnBagHandle = LoadGraph("Resource/2D/TitleBag.png");
+	if (mnBagHandle == -1) printfDx("画像ない");
+
+    SetFontSize(100);
 }
 
 LoadingScene::~LoadingScene()
@@ -86,8 +90,38 @@ void LoadingScene::Draw()
     SetUseZBufferFlag(FALSE);
     SetWriteZBufferFlag(FALSE);
 
+    // 背景の描画
+    DrawGraph(0, 0, mnBagHandle, TRUE);
+
+    // 濃い茶色の枠用ボックス
+    int frameWidth = 1020;
+    int frameHeight = 520;
+    DrawBox(
+        Utility::SCREEN_WIDTH / 2 - frameWidth / 2,
+        Utility::SCREEN_HEIGHT / 2 - frameHeight / 2,
+        Utility::SCREEN_WIDTH / 2 + frameWidth / 2,
+        Utility::SCREEN_HEIGHT / 2 + frameHeight / 2,
+        GetColor(139, 69, 19), // 濃い茶色
+        TRUE
+    );
+    // 先ほどのボックスを重ねて描画
+    int boxWidth = 1000;
+    int boxHeight = 500;
+
+    DrawBox(
+        Utility::SCREEN_WIDTH / 2 - boxWidth / 2,
+        Utility::SCREEN_HEIGHT / 2 - boxHeight / 2,
+        Utility::SCREEN_WIDTH / 2 + boxWidth / 2,
+        Utility::SCREEN_HEIGHT / 2 + boxHeight / 2,
+        GetColor(227, 190, 152),
+        TRUE
+    );
+
+
+
     const char* text = "LOADING...";
     int width = GetDrawStringWidth(text, (int)strlen(text));
+
     DrawFormatString(
         Utility::SCREEN_WIDTH / 2 - width / 2,
         Utility::SCREEN_HEIGHT / 2 - 120,
@@ -96,9 +130,10 @@ void LoadingScene::Draw()
         text
     );
 
-    const int barWidth = 600;
-    const int barHeight = 40;
-    const int radius = 20;
+    // バーの設定
+	const int barWidth = 700; // バーの全幅
+	const int barHeight = 50; // バーの高さ
+	const int radius = 20; // 角丸の半径
 
     int startX = Utility::SCREEN_WIDTH / 2 - barWidth / 2;
     int startY = Utility::SCREEN_HEIGHT / 2;

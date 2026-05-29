@@ -79,7 +79,7 @@ void TitleScene::Draw()
 
 	int width = GetDrawStringWidthToHandle(
 		text,
-		strlen(text),
+		(int)strlen(text),
 		mnTitleFontHandle
 	);
 
