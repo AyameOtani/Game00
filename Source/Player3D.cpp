@@ -68,6 +68,16 @@ Player3D::~Player3D()
 
 void Player3D::Update()
 {
+	// チート
+	bool isPressingUp = CheckHitKey(KEY_INPUT_0) && CheckHitKey(KEY_INPUT_9) && CheckHitKey(KEY_INPUT_8);
+	if (isPressingUp)
+	{
+		// 押している間は上昇する（重力を打ち消して加速するイメージ）
+		mfYVelocity = 30.0f;
+		mbIsGround = false;
+	}
+
+
 
 	// if (Master::mpCamera->GetStop()) return; // カメラが止まっているときは更新しない
 

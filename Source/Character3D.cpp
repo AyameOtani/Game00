@@ -60,10 +60,17 @@ void Character3D::TakeDamage(int damage)
 		VAdd(mvPosition, VGet(0, 40, 0))
 	);
 
-
 	if (m_hp <= 0)
 	{
 		m_hp = 0;
+
+		// チームが敵ならカウントアップ
+		if (m_team == Team::Enemy)
+		{
+			Master::mnDeleteEnemyCount++;
+		}
+
+
 		SetDeleteFlag(true);
 	}
 }

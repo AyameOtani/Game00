@@ -68,6 +68,7 @@ void GameScene::Initialize()
 	m_savedEnemyList.clear();
 	m_selectedId = 0;
 
+	Master::mnDeleteEnemyCount = 0; // 敵のカウントリセット
 	Master::mpCamera->Reset();
 	Master::mpCamera->SetTitleMode(false);
 
@@ -94,7 +95,7 @@ void GameScene::Initialize()
 		{ VGet(4872.89f,  1516.53f,  9233.34f),  Enemy3D::EnemyType::Runner }, // ID:8
 		{ VGet(3907.02f,  1516.53f,  9254.33f),  Enemy3D::EnemyType::Attacker }, // ID:9
 		{ VGet(7761.36f,  1265.33f,  8820.87f),  Enemy3D::EnemyType::Runner }, // ID:10
-		{ VGet(7865.66f,  1265.33f,  9675.2f),   Enemy3D::EnemyType::Attacker }, // ID:11
+		{ VGet(7865.66f,  1265.33f,  9675.2f),   Enemy3D::EnemyType::Runner }, // ID:11
 		{ VGet(7258.23f,  1265.33f,  9237.93f),  Enemy3D::EnemyType::Attacker }, // ID:12
 		{ VGet(15778.7f,  2254.78f,  9494.45f),  Enemy3D::EnemyType::Runner }, // ID:13
 		{ VGet(15231.2f,  2254.78f,  8963.72f),  Enemy3D::EnemyType::Attacker }, // ID:14

@@ -135,7 +135,7 @@ void LoadingScene::Draw()
         Utility::SCREEN_HEIGHT / 2 - boxHeight / 2,
         Utility::SCREEN_WIDTH / 2 + boxWidth / 2,
         Utility::SCREEN_HEIGHT / 2 + boxHeight / 2,
-        GetColor(227, 190, 152),
+        GetColor(207, 170, 132),
         TRUE
     );
 

@@ -33,4 +33,6 @@ public:
     static ModelSet slideStage;  // 移動ステージ
     static ModelSet updownStage; // 回転ステージ
     static ModelSet rotaStage;   // 微回転ステージ
+
+	static int mnDeleteEnemyCount; // 敵のカウント
 };

@@ -62,16 +62,48 @@ void LoseResultScene::Draw()
 	// îwåiÇÃï`âÊ
 	DrawGraph(0, 0, mnBagHandle, TRUE);
 
-	// ï∂éöÇÃîwåi
-	DrawRotaGraph(Utility::SCREEN_WIDTH / 2, 910, 0.6f, 0.0f, mnBoxHandle, TRUE);
+
+	int frameWidth = 1420;
+	int frameHeight = 820;
+
+	// UIîwåiÅiâeÅj
+	DrawBox(
+		Utility::SCREEN_WIDTH / 2 - frameWidth / 2,
+		Utility::SCREEN_HEIGHT / 2 - frameHeight / 2,
+		Utility::SCREEN_WIDTH / 2 + frameWidth / 2,
+		Utility::SCREEN_HEIGHT / 2 + frameHeight / 2,
+		GetColor(139, 69, 19),
+		TRUE
+	);
+
+
+	int boxWidth = 1400;
+	int boxHeight = 800;
+	// UIñ{ëÃ
+	DrawBox(
+		Utility::SCREEN_WIDTH / 2 - boxWidth / 2,
+		Utility::SCREEN_HEIGHT / 2 - boxHeight / 2,
+		Utility::SCREEN_WIDTH / 2 + boxWidth / 2,
+		Utility::SCREEN_HEIGHT / 2 + boxHeight / 2,
+		GetColor(207, 170, 132),
+		TRUE
+	);
+
 
 	// ÉçÉSÇÃï`âÊ
-	DrawRotaGraph(Utility::SCREEN_WIDTH / 2, Utility::SCREEN_HEIGHT / 2 - 110, 0.85f, 0.0f, mnRogoHandle, TRUE);
+	DrawRotaGraph(Utility::SCREEN_WIDTH / 2, Utility::SCREEN_HEIGHT / 2 - 180, 0.65f, 0.0f, mnRogoHandle, TRUE);
 
+
+	// ï∂éöÇÃîwåi
+	DrawRotaGraph(Utility::SCREEN_WIDTH / 2, 840, 0.6f, 0.0f, mnBoxHandle, TRUE);
+	int color = GetColor(255, 255, 255);
 	if (mShowText)
 	{
-		DrawFormatString(750, 880, GetColor(255, 255, 255), "EnterÇ≈TITLE");
+		DrawFormatString(750, 810, color, "EnterÇ≈TITLE");
 	}
+
+	DrawFormatString(Utility::SCREEN_WIDTH / 2 - 350, Utility::SCREEN_HEIGHT / 2+100, color, "ì|ÇµÇΩÇ®Ç©Ç∏ÇÃêî   %d", Master::mnDeleteEnemyCount);
+
 
 	// 3DópÇ…ê›íË
 	SetUseZBufferFlag(TRUE);
@@ -79,6 +111,7 @@ void LoseResultScene::Draw()
 
 	// äÓíÍÉNÉâÉXÇÃçXêVèàóùÇåƒÇ—ÇæÇ∑
 	Scene::Draw();
+
 }
 
 
