@@ -12,20 +12,22 @@ TitleScene::TitleScene()
 {
 	SetFontSize(70); // 文字の大きさ
 
-	mnRogoHandle = LoadGraph("Resource/2D/Title1.png");
+	mnRogoHandle = LoadGraph("Resource/2D/Title.png");
 	if (mnRogoHandle == -1) printfDx("画像ない");
 
-	mnBagHandle = LoadGraph("Resource/2D/TitleBag.png");
-	if (mnBagHandle == -1) printfDx("画像ない");
-
-	mnBoxHandle = LoadGraph("Resource/2D/TitleBox.png");
-	if (mnBoxHandle == -1) printfDx("画像ない");
 
 
 	// 文字作成
 	mnTitleFontHandle = CreateFontToHandle(
 		NULL,
 		100,
+		5
+	);
+
+	// 文字作成
+	mnSmallFontHandle = CreateFontToHandle(
+		NULL,
+		30,
 		5
 	);
 }
@@ -49,6 +51,11 @@ void TitleScene::Initialize()
 	SkyBox* pSkyBox = new SkyBox("Resource/3D/SkyBox/sky.mqo");
 	pSkyBox->SetScale(10.0f);  // 最大で9.0ぐらい？ 1222
 
+
+	// ずっとループだからfalseにしている
+	Master::mpSoundManager->PlayBGM(SoundManager::BGM_TITLE, false, 170);
+
+
 }
 
 
@@ -59,7 +66,19 @@ void TitleScene::Update()
 	{
 		// 直接ゲームに飛ばすのではなくローディングシーンを挟む
 		Master::mpSceneManager->SetNextScene(SceneManager::SCENE_TYPE::LOADING_3D);
+		Master::mpSoundManager->PlaySE(SoundManager::SE_ENTER, 255);
+
 	}
+
+
+	mBlinkCounter++;
+
+	// 30フレームごとに切り替え（約0.5秒）
+	if (mBlinkCounter > 30) {
+		mShowText = !mShowText;
+		mBlinkCounter = 0;
+	}
+
 
 	// 基底クラスの更新処理を呼びだす
 	Scene::Update();
@@ -75,25 +94,15 @@ void TitleScene::Draw()
 	SetUseZBufferFlag(FALSE);
 	SetWriteZBufferFlag(FALSE);
 
-	const char* text = "たこさんウインナーは弁当箱に帰りたい";
+	DrawRotaGraph(Utility::SCREEN_WIDTH / 2, Utility::SCREEN_HEIGHT / 2-150, 1.0f, 0.0f, mnRogoHandle, TRUE);
 
-	int width = GetDrawStringWidthToHandle(
-		text,
-		(int)strlen(text),
-		mnTitleFontHandle
-	);
+	int color = GetColor(255, 255, 255);
+	if (mShowText)
+	{
+		DrawFormatString(750, 880, GetColor(255, 255, 255), "EnterでSTART");
+	}
 
-	// 中央を500に合わせる
-	int x = (Utility::SCREEN_WIDTH - width) / 2;
-
-	DrawFormatStringToHandle(
-		x, 400,
-		GetColor(255, 255, 255),
-		mnTitleFontHandle,
-		text
-	);
-
-	DrawFormatString(750, 880, GetColor(255, 255, 255), "EnterでSTART");
+	DrawFormatStringToHandle(1700, 1020, GetColor(255, 255, 255),mnSmallFontHandle, "音楽：魔王魂");
 
 	// 3D用に設定
 	SetUseZBufferFlag(TRUE);
@@ -106,4 +115,7 @@ void TitleScene::Finalize()
 {
 	// フォントハンドルの削除
 	DeleteFontToHandle(mnTitleFontHandle);
+	DeleteFontToHandle(mnSmallFontHandle);
+	// 画像の削除
+	DeleteGraph(mnRogoHandle);
 }

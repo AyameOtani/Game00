@@ -218,7 +218,7 @@ void Camera::UpdateRotation()
 		}
 
 		//  計算した速度を角度に反映
-		mfHorizontalAngle += mfCurrentSpeedH; // それをここでやっても+ だけど-5とかだから左に行くはず
+		mfHorizontalAngle -= mfCurrentSpeedH; // それをここでやっても+ だけど-5とかだから左に行くはず
 		mfVerticalAngle += mfCurrentSpeedV;
 
 		// 角度の正規化clamp

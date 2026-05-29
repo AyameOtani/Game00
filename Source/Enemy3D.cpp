@@ -100,13 +100,26 @@ void Enemy3D::Jump()
 		mfJumpTimer -= 1.0f; // 毎フレーム減らす
 		if (mfJumpTimer <= 0.0f)
 		{
-			mfYVelocity = mfJumpPower; // ジャンプパワー（必要に応じて調整）
+			mfYVelocity = mfJumpPower; // ジャンプパワー
 			mbIsGround = false;
 			mfJumpTimer = 120.0f; // 次のジャンプまでの間隔（約2秒）
+
+			// プレイヤーを取得して距離を判定
+			auto playerList = Master::mpSceneManager->GetCurrentScene()->GetObjectManager()->GetObject3DListByTag(Object3D::T_Player3D);
+			if (!playerList.empty())
+			{
+				VECTOR playerPos = playerList[0]->GetPosition();
+				float distance = VSize(VSub(playerPos, mvPosition));
+
+				// 距離が700以内ならSEを再生
+				if (distance <= 700.0f)
+				{
+					Master::mpSoundManager->PlaySE(SoundManager::SE_JUMP, 150);
+				}
+			}
 		}
 	}
 }
-
 // 更新処理
 void Enemy3D::Update()
 {
@@ -248,6 +261,7 @@ void Enemy3D::Shot()
 
 	// 弾生成
 	new Bullet3D(spawnPos, "Resource/3D/Bullet/EnemyBullet.mqo", dir, Team::Enemy);
+	Master::mpSoundManager->PlaySE(SoundManager::SE_SHOT, 150);
 }
 // モデル同期（Character3D::SyncModel の実装）
 void Enemy3D::SyncModel()
@@ -270,6 +284,7 @@ float Enemy3D::GetRadius() const
 {
 	return Character3D::GetRadius();
 }
+
 
 void Enemy3D::UpdateRunner()
 {

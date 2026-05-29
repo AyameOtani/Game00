@@ -354,24 +354,6 @@ void Character3D::ResolveCollision3D()
 				SyncModel();
 			}
 
-			//if (floorNormal.y < 0.95f)
-			//{
-			//	VECTOR downDir = VGet(0.0f, -1.0f, 0.0f);
-
-			//	float dot = VDot(downDir, floorNormal);
-			//	VECTOR slideDir = VSub(downDir, VScale(floorNormal, dot));
-
-			//	if (VSize(slideDir) > 0.0001f)
-			//	{
-			//		slideDir = VNorm(slideDir);
-
-			//		float slideStrength = (1.0f - floorNormal.y) * 30.0f;
-			//		if (slideStrength > 50.0f) slideStrength = 50.0f;
-
-			//		mvPosition = VAdd(mvPosition, VScale(slideDir, slideStrength));
-			//	}
-			//}
-
 			// °Šm’èˆ—‚ÌÅŒã‚Ì•û‚É‚ ‚éŠŠ‚èˆ—‚ğ‚±‚Ì‚æ‚¤‚É‘‚«Š·‚¦‚Ü‚·
 			if (floorNormal.y < 0.95f)
 			{

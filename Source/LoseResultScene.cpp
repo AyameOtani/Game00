@@ -37,6 +37,15 @@ void LoseResultScene::Update()
 	if (InputManager::CheckDownKey(KEY_INPUT_RETURN))
 	{
 		Master::mpSceneManager->SetNextScene(SceneManager::SCENE_TYPE::TITLE_3D);
+		Master::mpSoundManager->PlaySE(SoundManager::SE_ENTER, 255);
+	}
+
+	mBlinkCounter++;
+
+	// 30フレームごとに切り替え（約0.5秒）
+	if (mBlinkCounter > 30) {
+		mShowText = !mShowText;
+		mBlinkCounter = 0;
 	}
 
 	// 基底クラスの更新処理を呼びだす
@@ -59,7 +68,10 @@ void LoseResultScene::Draw()
 	// ロゴの描画
 	DrawRotaGraph(Utility::SCREEN_WIDTH / 2, Utility::SCREEN_HEIGHT / 2 - 110, 0.85f, 0.0f, mnRogoHandle, TRUE);
 
-	DrawFormatString(750, 880, GetColor(255, 255, 255), "EnterでTITLE");
+	if (mShowText)
+	{
+		DrawFormatString(750, 880, GetColor(255, 255, 255), "EnterでTITLE");
+	}
 
 	// 3D用に設定
 	SetUseZBufferFlag(TRUE);

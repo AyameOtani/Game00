@@ -25,11 +25,13 @@ void SoundManager::Initialize()
 	//ChangeVolumeSoundMem(255 * 80 / 100, SHandle);
 
 	// BGM の読み込み
-	LoadBGM(SOUND_BGM::BGM_TITLE, "Resource/BGM/Title.mp3");		// タイトル用のBGM
+	LoadBGM(SOUND_BGM::BGM_TITLE, "Resource/BGM/Title1.mp3");	// タイトル用のBGM
 
 	// SE の読み込み
-	LoadSE(SOUND_SE::SE_DECIDE, "Resource/SE/Select1.mp3");				// 決定音   ぽぽぽ シューティングで使った
-	LoadSE(SOUND_SE::SE_SELECT, "Resource/SE/Select.mp3");				// 選択音	 ぺ
+	LoadSE(SOUND_SE::SE_ENTER, "Resource/SE/Enter.mp3");		// 決定音
+	LoadSE(SOUND_SE::SE_SELECT, "Resource/SE/Select.mp3");		// 選択音
+	LoadSE(SOUND_SE::SE_JUMP, "Resource/SE/Jump.mp3");			// ジャンプ音
+	LoadSE(SOUND_SE::SE_SHOT, "Resource/SE/Shot.mp3");			// ジャンプ音
 }
 
 

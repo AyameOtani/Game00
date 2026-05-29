@@ -33,9 +33,6 @@
     <ClInclude Include="Source\Camera.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Collision.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="Source\InputManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>

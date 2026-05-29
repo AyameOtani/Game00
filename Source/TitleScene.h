@@ -18,12 +18,13 @@ public:
 
 private:
     int mnRogoHandle; // ロゴのハンドル
-    int mnBagHandle; // 背景のハンドル
-	int mnBoxHandle; // 文字の背景のハンドル
 
     // フォント
     int mnTitleFontHandle;
+	int mnSmallFontHandle;
 
+	int mBlinkCounter = 0; // 点滅のカウンター
+	bool mShowText = true; // テキストを表示するかどうかのフラグ
 };
 
 

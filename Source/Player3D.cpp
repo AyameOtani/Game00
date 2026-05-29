@@ -78,7 +78,11 @@ void Player3D::Update()
 	RotationByMove();
 
 	if (mfShotTimer > 0.0f) mfShotTimer -= 1.0f;
-	if (CheckHitKey(KEY_INPUT_B) || (GetJoypadInputState(DX_INPUT_PAD1) & PAD_INPUT_2)) Shot();
+
+	if (CheckHitKey(KEY_INPUT_B) || (GetJoypadInputState(DX_INPUT_PAD1) & PAD_INPUT_2))
+	{
+		Shot();
+	}
 
 	// 共通化した Character3D::ResolveCollision3D を利用する
 	ResolveCollision3D();
@@ -142,6 +146,8 @@ void Player3D::Shot()
 	// 弾を生成（位置、モデル名、方向、陣営を渡す）
 	// ※Team::Playerを指定することで、味方撃ちを防ぐ
 	new Bullet3D(spawnPos, "Resource/3D/Bullet/PlayerBullet.mqo", shotDir, Team::Player);
+	Master::mpSoundManager->PlaySE(SoundManager::SE_SHOT, 230);
+
 
 	// 発射後にクールタイムをセット
 	mfShotTimer = SHOT_INTERVAL;
@@ -302,6 +308,7 @@ void Player3D::Jump()
 	// スペースを押していたらジャンプ（地面にいるときのみ）
 	if (mbIsGround && (InputManager::CheckDownKey(KEY_INPUT_SPACE) || (GetJoypadInputState(DX_INPUT_PAD1) & PAD_INPUT_1)))
 	{
+		Master::mpSoundManager->PlaySE(SoundManager::SE_JUMP, 230);
 		mfYVelocity = mfJumpPower;
 		mbIsGround = false;
 	}
@@ -309,13 +316,6 @@ void Player3D::Jump()
 	mfYVelocity += mfGravity; // 重力加算
 	if (mfYVelocity < -mfMaxFallSpeed) mfYVelocity = -mfMaxFallSpeed; // 落下速度制限
 	mvPosition.y += mfYVelocity;
-
-	// デバッグ用 飛べる
-	if (CheckHitKey(KEY_INPUT_0))
-	{
-		mfYVelocity = 20.0f;
-		mbIsGround = false;
-	}
 }
 
 // SyncModel: モデルを持つ派生クラスはここで位置・回転を反映する

@@ -1,7 +1,6 @@
 ﻿#include "DxLib.h"
 #include "Texture.h"  // ../は一階層上にあるものを読み込むという意味
 #include "TextureAnimation.h"
-#include "Collision.h"
 #include "SceneManager.h"
 #include "Master.h"
 #include "ObjectManager.h"

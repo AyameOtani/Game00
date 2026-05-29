@@ -7,16 +7,13 @@ ResourceManager::ResourceManager()
 
 ResourceManager::~ResourceManager()
 {
-    // オリジナルのハンドルを削除する
+    // メモリリーク防止のため、キャッシュしていた全てのモデルデータを解放
     for (int i = 0; i < resourceMapList.size(); i++)
-   
-  
- 
-
-{
+    {
         MV1DeleteModel(resourceMapList.at(i).second);
     }
 
+    // DxLibの全リソースを初期化し、メモリをクリーンにする
     MV1InitModel();
     InitGraph();
 }
@@ -24,70 +21,46 @@ ResourceManager::~ResourceManager()
 // モデルリソース生成
 int ResourceManager::LoadModel(std::string pathName)
 {
-    // 既に読み込まれたモデルかどうか確認
+    // 既に読み込まれたモデルか確認（キャッシュ利用によるメモリ節約）
     for (int i = 0; i < resourceMapList.size(); i++)
-   
-  
- 
-
-{
+    {
         if (resourceMapList.at(i).first == pathName)
-       
-      
-     
-    
-   
-  
-  {
-            // 読み込まれているならモデルハンドルを複製して返す
+        {
+            // 複製して返すことで、モデル本体はResourceManagerで保持しつつ
+            // 個別の描画・操作が可能になる
             return MV1DuplicateModel(resourceMapList.at(i).second);
         }
     }
 
-    // 読み込まれていない場合は新たに読み込む
+    // 未読み込みの場合は新規ロード
     int handle = MV1LoadModel(pathName.c_str());
     if (handle == -1)
-   
-  
- 
-
-{
+    {
         return -1;
     }
 
-    // vector に追加
+    // オリジナルのハンドルをキャッシュとして保存
     resourceMapList.push_back(std::pair<std::string, int>(pathName, handle));
-    return MV1DuplicateModel(handle);   // オリジナルのハンドルは残しておきたいので複製して返しておく
+
+    // 呼び出し元には複製したハンドルを渡す
+    return MV1DuplicateModel(handle);
 }
 
 // グラフィックリソース生成
 int ResourceManager::LoadGraphics(std::string pathName)
 {
+    // 同一画像は複数回読み込まず、既存のハンドルを再利用
     for (int i = 0; i < graphicResourceMapList.size(); i++)
-   
-  
- 
-
-{
+    {
         if (graphicResourceMapList.at(i).first == pathName)
-       
-      
-     
-    
-   
-  
-  {
+        {
             return graphicResourceMapList.at(i).second;
         }
     }
 
     int handle = LoadGraph(pathName.c_str());
     if (handle == -1)
-   
-  
- 
-
-{
+    {
         return -1;
     }
 
@@ -95,69 +68,42 @@ int ResourceManager::LoadGraphics(std::string pathName)
     return handle;
 }
 
-// 分割されたグラフィックリソース生成
+// 分割グラフィックリソース生成
 DivGraphData* ResourceManager::LoadDivGraphics(std::string pathName, int allNum, int numX, int numY)
 {
+    // キャッシュ済みの分割データを確認
     for (int i = 0; i < divGraphicResourceMapList.size(); i++)
-   
-  
- 
-
-{
+    {
         if (divGraphicResourceMapList.at(i)->filePath == pathName)
-       
-      
-     
-    
-   
-  
-  {
+        {
             return divGraphicResourceMapList.at(i);
         }
     }
 
-    // 一旦テクスチャを読み込み
+    // サイズ取得用に一旦ロード
     int handle = LoadGraph(pathName.c_str());
     if (handle == -1)
-   
-  
- 
-
-{
+    {
         return nullptr;
     }
 
-    // 自作したクラスに情報を格納
-    DivGraphData* data = new DivGraphData(
-        pathName,
-        numX, numY,
-        allNum
-    );
+    // 管理用データクラスの作成
+    DivGraphData* data = new DivGraphData(pathName, numX, numY, allNum);
 
-    // 一旦読み込んだテクスチャの画像サイズを取得
+    // 画像サイズから分割サイズを算出
     int sizeX, sizeY;
     GetGraphSize(handle, &sizeX, &sizeY);
 
-    // テクスチャ分割読み込み
-    std::vector<int> test;
-    handle = LoadDivGraph(pathName.c_str(), allNum, numX, numY, sizeX / numX, sizeY / numY, data->divHandleList);
-    if (handle == -1)
-   
-  
- 
-
-{
+    // 分割読み込み実行
+    int result = LoadDivGraph(pathName.c_str(), allNum, numX, numY, sizeX / numX, sizeY / numY, data->divHandleList);
+    if (result == -1)
+    {
+        delete data; // 失敗時はメモリ解放
         return nullptr;
     }
 
-    // データを保存
+    // キャッシュに保存
     divGraphicResourceMapList.push_back(data);
 
     return data;
 }
-
-
-
-
-
-
