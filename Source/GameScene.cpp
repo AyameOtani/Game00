@@ -48,6 +48,9 @@ GameScene::GameScene()
 	SetFontSize(60);
 
 	mnGoalHandle = LoadGraph("Resource/2D/Goal.png");
+	if (mnGoalHandle == -1) printfDx("ゴール画像ない");
+	mnOptionHandle = LoadGraph("Resource/2D/Option.png");
+	if (mnOptionHandle == -1) printfDx("操作画像ない");
 }
 
 GameScene::~GameScene() {}
@@ -83,19 +86,19 @@ void GameScene::Initialize()
 	std::vector<EnemySpawnData> enemySpawnList =
 	{
 		{ VGet(3359.66f,  -9.249f,   -3.62714f), Enemy3D::EnemyType::Jumper }, // ID:0
-		{ VGet(9068.31f,  126.234f,  56.1533f),  Enemy3D::EnemyType::Attacker }, // ID:1
+		{ VGet(9068.31f,  126.234f,  56.1533f),  Enemy3D::EnemyType::Runner }, // ID:1
 		{ VGet(9524.75f,  126.234f,  667.882f),  Enemy3D::EnemyType::Jumper }, // ID:2
-		{ VGet(9280.21f,  126.234f,  1281.94f),  Enemy3D::EnemyType::Attacker }, // ID:3
-		{ VGet(9812.92f,  891.537f,  3717.11f),  Enemy3D::EnemyType::Attacker }, // ID:4
+		{ VGet(9280.21f,  126.234f,  1281.94f),  Enemy3D::EnemyType::Runner }, // ID:3
+		{ VGet(9812.92f,  891.537f,  3717.11f),  Enemy3D::EnemyType::Runner }, // ID:4
 		{ VGet(9238.21f,  891.538f,  4081.83f),  Enemy3D::EnemyType::Attacker }, // ID:5
-		{ VGet(4149.27f,  1520.65f,  3620.09f),  Enemy3D::EnemyType::Attacker }, // ID:6
+		{ VGet(4149.27f,  1520.65f,  3620.09f),  Enemy3D::EnemyType::Runner }, // ID:6
 		{ VGet(4685.61f,  1520.65f,  4264.24f),  Enemy3D::EnemyType::Attacker }, // ID:7
-		{ VGet(4872.89f,  1516.53f,  9233.34f),  Enemy3D::EnemyType::Attacker }, // ID:8
+		{ VGet(4872.89f,  1516.53f,  9233.34f),  Enemy3D::EnemyType::Runner }, // ID:8
 		{ VGet(3907.02f,  1516.53f,  9254.33f),  Enemy3D::EnemyType::Attacker }, // ID:9
-		{ VGet(7761.36f,  1265.33f,  8820.87f),  Enemy3D::EnemyType::Attacker }, // ID:10
+		{ VGet(7761.36f,  1265.33f,  8820.87f),  Enemy3D::EnemyType::Runner }, // ID:10
 		{ VGet(7865.66f,  1265.33f,  9675.2f),   Enemy3D::EnemyType::Attacker }, // ID:11
 		{ VGet(7258.23f,  1265.33f,  9237.93f),  Enemy3D::EnemyType::Attacker }, // ID:12
-		{ VGet(15778.7f,  2254.78f,  9494.45f),  Enemy3D::EnemyType::Attacker }, // ID:13
+		{ VGet(15778.7f,  2254.78f,  9494.45f),  Enemy3D::EnemyType::Runner }, // ID:13
 		{ VGet(15231.2f,  2254.78f,  8963.72f),  Enemy3D::EnemyType::Attacker }, // ID:14
 		{ VGet(15390.4f,  2318.83f,  10858.9f),  Enemy3D::EnemyType::Attacker }  // ID:15
 	};
@@ -171,6 +174,7 @@ void GameScene::Initialize()
 	);
 
 
+
 	// でかめの床	   奥
 	Stage* rota2 = new Stage("Resource/3D/Stage1/rotaStage2.mqo", "Resource/3D/Stage1/rotaStage2.mqo"
 		, VGet(7605.0f, 600.0f, 3800.0f),Stage::StageType::Rotate);
@@ -183,6 +187,7 @@ void GameScene::Initialize()
 	);
 
 
+
    // ------ フォグ設定 ------
 	SetFogEnable(TRUE); // フォグ有効
 	SetFogMode(DX_FOGMODE_LINEAR); // 線形フォグ
@@ -193,22 +198,11 @@ void GameScene::Initialize()
 }
 
 
-//--------------------------------------------------
-// 更新
-//--------------------------------------------------
 void GameScene::Update()
 {
-	//--------------------------------------------------
-	// シーン切り替えショートカット
-	//--------------------------------------------------
-	if (InputManager::CheckDownKey(KEY_INPUT_9))
-	{
-		Master::mpSceneManager->SetNextScene(SceneManager::SCENE_TYPE::WIN_RESULT_3D);
-	}
+	Master::mpCamera->SetStop(false); // カメラ停止
 
-	//--------------------------------------------------
 	// プレイヤー取得 & 勝敗判定
-	//--------------------------------------------------
 	auto playerList =
 		Master::mpSceneManager->GetCurrentScene()
 		->GetObjectManager()
@@ -226,7 +220,7 @@ void GameScene::Update()
 
 		// ゴール判定 (球判定)
 		VECTOR playerPos = player->GetPosition();
-		
+
 		// プレイヤーとゴール間の距離を計算
 		float dist = VSize(VSub(playerPos, mvGoalPosition));
 
@@ -243,47 +237,6 @@ void GameScene::Update()
 			Master::mpSceneManager->SetNextScene(SceneManager::SCENE_TYPE::LOSE_RESULT_3D);
 			return;
 		}
-
-		//--------------------------------------------------
-		// ★エディタ機能（ID選択＆配置）
-		//--------------------------------------------------
-		if (InputManager::CheckDownKey(KEY_INPUT_6)) m_selectedId--;
-		if (InputManager::CheckDownKey(KEY_INPUT_7)) m_selectedId++;
-
-		if (!m_enemyList.empty())
-		{
-			if (m_selectedId < 0) m_selectedId = 0;
-			if (m_selectedId >= (int)m_enemyList.size())
-				m_selectedId = (int)m_enemyList.size() - 1;
-		}
-
-		if (InputManager::CheckDownKey(KEY_INPUT_3))
-		{
-			if (m_selectedId >= 0 && m_selectedId < (int)m_enemyList.size())
-			{
-				VECTOR pos = player->GetPosition();
-
-				// 敵をプレイヤー位置へ移動
-				m_enemyList[m_selectedId]->SetPosition(pos);
-
-				// 保存
-				bool found = false;
-				for (auto& d : m_savedEnemyList)
-				{
-					if (d.id == m_selectedId)
-					{
-						d.pos = pos;
-						found = true;
-						break;
-					}
-				}
-
-				if (!found)
-				{
-					m_savedEnemyList.push_back({ m_selectedId, pos });
-				}
-			}
-		}
 	}
 
 	// 全滅チェック
@@ -293,46 +246,46 @@ void GameScene::Update()
 		return;
 	}
 
-	//--------------------------------------------------
-	// 保存
-	//--------------------------------------------------
-	SaveEnemyDataToFile();
+	SaveEnemyDataToFile(); // 位置をファイル保存デバッグで使用した
 
 	Scene::Update();
 }
 
 
-//--------------------------------------------------
 // 描画
-//--------------------------------------------------
 void GameScene::Draw()
 {
-	DrawFormatString(
+	/*DrawFormatString(
 		0, 0,
 		GetColor(255, 255, 255),
 		"Selected Enemy ID: %d / %d",
 		m_selectedId,
 		(int)m_enemyList.size() - 1
-	);
-
-
-	// --- ゴールに画像を表示 ---
-	VECTOR goalPos = VGet(15590.0f, 3100.0f, 14430.0f);
-	// DrawBillboard3D で描画
-	// Pos:座標, cx/cy:中心点(0.5で中央), Size:大きさ, Angle:回転, Handle, TransFlag
-	DrawBillboard3D(goalPos, 0.5f, 0.5f, 800.0f, 0.0f, mnGoalHandle, TRUE);
-
-	// goalのあたり判定デバッグ用
-	DrawSphere3D(mvGoalPosition, mfGoalRadius, 16, GetColor(0, 255, 0), GetColor(0, 255, 0), FALSE);
+	);*/
 
 
 	Scene::Draw();
+
+
+	//少し透けて描画する
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 230);
+	DrawGraph(0, 0, mnOptionHandle, TRUE);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+
+
+
+	//ゴールに画像を表示
+	VECTOR goalPos = VGet(15590.0f, 3100.0f, 14430.0f);
+	// DrawBillboard3D で描画
+	DrawBillboard3D(goalPos, 0.5f, 0.5f, 800.0f, 0.0f, mnGoalHandle, TRUE);
+
+	// goalのあたり判定デバッグ用
+	// DrawSphere3D(mvGoalPosition, mfGoalRadius, 16, GetColor(0, 255, 0), GetColor(0, 255, 0), FALSE);
 }
 
 
-//--------------------------------------------------
 // 終了
-//--------------------------------------------------
 void GameScene::Finalize()
 {
 	if (Master::mpCamera)
@@ -342,14 +295,14 @@ void GameScene::Finalize()
 }
 
 
-//--------------------------------------------------
 // 敵データ保存
-//--------------------------------------------------
 void GameScene::SaveEnemyDataToFile()
 {
+	// 保存するtxt名前
 	std::ofstream ofs("EnemyPlacement.txt");
 	if (!ofs) return;
 
+	// 順に入力
 	for (auto& d : m_savedEnemyList)
 	{
 		ofs << "ID: " << d.id

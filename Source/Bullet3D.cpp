@@ -15,6 +15,7 @@ Bullet3D::Bullet3D(VECTOR initPos, std::string filename, VECTOR Direction, Team 
     , m_shooterTeam(shooterTeam)
     , mfMoveSpeed(0.0f)
     , mEffectDistance(0.0f)
+    , mfScale(1.0f)
 {
     // 初期座標を明示的に設定（Object3D の実装差異に依存しないように）
     mvPosition = initPos;
@@ -91,19 +92,40 @@ void Bullet3D::Draw()
  */
 void Bullet3D::Move()
 {
-    // フレーム毎の移動。必要ならフレームレート依存を外す（dt を掛ける）方向に改良してください。
+    // 移動
     mvPosition = VAdd(mvPosition, VScale(mvDirection, mfSpeed));
 
-    // 移動距離を積算
+    // 距離加算
     mfMoveSpeed += mfSpeed;
-    if (mfMoveSpeed >= 2000.0f)
+
+    // ★スケール制御
+    if (mfMoveSpeed >= 1500.0f)
+    {
+        float t = (mfMoveSpeed - 1500.0f) / 200.0f;
+
+        mfScale = 1.0f - t;
+
+        if (mfScale < 0.0f)
+        {
+            mfScale = 0.0f;
+        }
+    }
+
+    // 1700で消滅
+    if (mfMoveSpeed >= 1900.0f)
     {
         SetDeleteFlag(true);
         return;
     }
 
-    if (mpModel) mpModel->SetPosition(mvPosition);
+    // モデル更新
+    if (mpModel)
+    {
+        mpModel->SetScale(mfScale);   // ★これが通るならOK（float版）
+        mpModel->SetPosition(mvPosition);
+    }
 }
+
 
 /**
  * @brief 壁判定

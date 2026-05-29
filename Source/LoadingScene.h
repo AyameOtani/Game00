@@ -1,21 +1,23 @@
 #pragma once
 #include "Scene.h"
 
-// 単純ローディングシーン：必要なモデルを一度だけ読み込み、次シーンをセットする
 class LoadingScene : public Scene
 {
 public:
-	LoadingScene();
-	~LoadingScene();
+    LoadingScene();
+    ~LoadingScene();
 
-	void Initialize() override;
-	void Update() override;
-	void Draw() override;
-	void Finalize() override;
+    void Initialize() override;
+    void Update() override;
+    void Draw() override;
+    void Finalize() override;
 
 private:
-	bool mbLoaded;
-	int mnProgressCounter;
+    // ロード進行管理
+    int mnProgressCounter = 0;   // どこまでロードしたか
 
-	int mMinWaitFrame; // 最低表示フレーム数
+    // 最低表示時間
+    int mMinWaitFrame = 0;       // ロード後の待機時間
+
+    int mnBagHandle = -1; // ロゴのハンドル
 };

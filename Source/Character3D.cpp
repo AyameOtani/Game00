@@ -6,6 +6,7 @@
 #include "Stage.h"
 #include <cfloat>
 #include <algorithm>
+#include "HitEffect.h"
 
 // コンストラクタ：当たり判定パラメータはデフォルト値を入れておく。
 // 派生クラス（Player3D / Enemy3D）はここを上書きして細かく調整する。
@@ -54,6 +55,12 @@ Character3D::~Character3D()
 void Character3D::TakeDamage(int damage)
 {
 	m_hp -= damage;
+
+	new HitEffect(
+		VAdd(mvPosition, VGet(0, 40, 0))
+	);
+
+
 	if (m_hp <= 0)
 	{
 		m_hp = 0;
@@ -247,7 +254,7 @@ void Character3D::ResolveCollision3D()
 
 			VECTOR hitPos = pStage->CheckHit_Line(start, end);
 
-			DrawLine3D(start, end, GetColor(255, 0, 0));
+			//DrawLine3D(start, end, GetColor(255, 0, 0));
 
 			if (VSize(hitPos) > 0.0001f)
 			{
@@ -284,7 +291,7 @@ void Character3D::ResolveCollision3D()
 				VECTOR start = VAdd(mvPosition, VAdd(offset, VGet(0, m_ceilLineMinY, 0)));
 				VECTOR end = VAdd(mvPosition, VAdd(offset, VGet(0, m_ceilLineMaxY, 0)));
 
-				DrawLine3D(start, end, GetColor(0, 0, 255));
+				//DrawLine3D(start, end, GetColor(0, 0, 255));
 
 				VECTOR hit = pStage->CheckHit_Line(start, end);
 				if (VSize(hit) > 0.0001f)

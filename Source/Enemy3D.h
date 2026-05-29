@@ -24,6 +24,10 @@ public:
 	void DebugDraw(); // デバッグ描画
 	void Shot(); // 発射処理
 
+	void Jump(); // ジャンプ処理  Jumper用
+
+	void UpdateRunner(); // Runner 用の移動処理
+
 	// 敵のタイプに応じたモデルのパスを返す関数
 	std::string GetModelPath(Enemy3D::EnemyType type);
 
@@ -54,4 +58,8 @@ private:
 	static int s_nextEnemyID;
 private:
 	float mfJumpTimer = 0.0f; // ジャンプ用のタイマー
+
+	VECTOR mvBasePosition; //スポーン地点
+	VECTOR mvTargetPosition; // 目標移動先
+	float mfMoveTimer = 0.0f; // 移動タイマー
 };

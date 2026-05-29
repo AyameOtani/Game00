@@ -33,4 +33,6 @@ private:
     float mEffectDistance = 0.0f;
 
     Model* mpModel = nullptr;
+
+    float mfScale; // ‘å‚«‚³
 };

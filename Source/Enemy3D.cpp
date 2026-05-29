@@ -12,7 +12,7 @@ int Enemy3D::s_nextEnemyID = 0;
 
 // コンストラクタ
 Enemy3D::Enemy3D(VECTOR initPos, EnemyType type)
-	: Character3D(initPos, 2, Team::Enemy, 60.0f)
+	: Character3D(initPos, 1, Team::Enemy, 60.0f)
 	, m_type(type)
 	, mfAngle(0.0f)
 	, mfTargetAngle(0.0f)
@@ -52,9 +52,14 @@ Enemy3D::Enemy3D(VECTOR initPos, EnemyType type)
 
 	m_id = s_nextEnemyID++;
 
+	// 動く敵の位置保存
+	mvBasePosition = initPos;
+	mvTargetPosition = initPos;
+
 	SetFontSize(20);
 }
 
+// タイプによってモデルを分ける処理
 std::string Enemy3D::GetModelPath(Enemy3D::EnemyType type)
 {
 	switch (type)
@@ -85,30 +90,32 @@ Enemy3D::~Enemy3D()
 	}
 }
 
+void Enemy3D::Jump()
+{
+	if (m_type != Jumper) return;
+
+	// 地面にいて、かつタイマーが0以下ならジャンプ
+	if (mbIsGround)
+	{
+		mfJumpTimer -= 1.0f; // 毎フレーム減らす
+		if (mfJumpTimer <= 0.0f)
+		{
+			mfYVelocity = mfJumpPower; // ジャンプパワー（必要に応じて調整）
+			mbIsGround = false;
+			mfJumpTimer = 120.0f; // 次のジャンプまでの間隔（約2秒）
+		}
+	}
+}
+
 // 更新処理
 void Enemy3D::Update()
 {
 	// フレーム開始時の位置を保存（ResolveCollision3D が参照する）
 	mvOldPosition = mvPosition;
 
+	Jump();
 
-
-	// Jumper 用の自動ジャンプ処理
-	if (m_type == Jumper)
-	{
-		// 地面にいて、かつタイマーが0以下ならジャンプ
-		if (mbIsGround)
-		{
-			mfJumpTimer -= 1.0f; // 毎フレーム減らす
-			if (mfJumpTimer <= 0.0f)
-			{
-				mfYVelocity = mfJumpPower; // ジャンプパワー（必要に応じて調整）
-				mbIsGround = false;
-				mfJumpTimer = 120.0f; // 次のジャンプまでの間隔（約2秒）
-			}
-		}
-	}
-
+	UpdateRunner();
 
 	// 重力 これで落下ありになる
 	mfYVelocity += mfGravity;
@@ -117,19 +124,15 @@ void Enemy3D::Update()
 	// 落下したときは削除
 	if (mvPosition.y < -4000.0f) SetDeleteFlag(true);
 
-
 	// シンプルな射撃タイマー（Attacker のみ）
-	if (m_type == Attacker)
+	if (mfShotTimer > 0.0f)
 	{
-		if (mfShotTimer > 0.0f)
-		{
-			mfShotTimer -= 1.0f;
-		}
-		else
-		{
-			Shot();
-			mfShotTimer = SHOT_INTERVAL;
-		}
+		mfShotTimer -= 1.0f;
+	}
+	else
+	{
+		Shot();
+		mfShotTimer = SHOT_INTERVAL;
 	}
 
 	// 共通の衝突解決（床・壁・天井）
@@ -148,7 +151,17 @@ void Enemy3D::Draw()
 	if (mpModel) mpModel->Draw();
 
 	// 共通デバッグ（Character3D::DebugDraw を利用）
-	DebugDraw();
+	//DebugDraw();
+
+	// 移動可能範囲の可視化（デバッグ用）
+	DrawSphere3D(
+		mvBasePosition,   // 中心（元の位置）
+		200.0f,            // 移動可能半径
+		16,
+		GetColor(0, 255, 0),
+		GetColor(0, 255, 0),
+		FALSE
+	);
 
 	Object3D::Draw();
 }
@@ -206,28 +219,36 @@ void Enemy3D::Shot()
 {
 	if (m_type != Attacker) return;
 
-	// プレイヤーの情報を取得
-	auto playerList = Master::mpSceneManager->GetCurrentScene()->GetObjectManager()->GetObject3DListByTag(Object3D::T_Player3D);
+	// プレイヤー取得
+	auto playerList =
+		Master::mpSceneManager->GetCurrentScene()
+		->GetObjectManager()
+		->GetObject3DListByTag(Object3D::T_Player3D);
 
 	// プレイヤーがいない場合は撃たない
 	if (playerList.empty()) return;
 
-	// 最初のプレイヤー（リストの先頭）をターゲットにする
 	Object3D* player = playerList[0];
 	VECTOR playerPos = player->GetPosition();
 
-	// 弾のスポーン位置
+	// 距離チェック
+	float distance = VSize(VSub(playerPos, mvPosition));
+	if (distance > 1500.0f)
+	{
+		return;
+	}
+
+	// 弾のスポーン位置（少し上から発射）
 	VECTOR spawnPos = VAdd(mvPosition, VGet(0.0f, 30.0f, 0.0f));
 
-	// プレイヤーへの向きを計算 (正規化して方向ベクトルを作る)
+	// プレイヤーへの向き（水平射撃）
 	VECTOR dir = VSub(playerPos, mvPosition);
-	dir.y = 0.0f; // Y軸方向のズレを無視して水平に飛ばす場合
-	dir = VNorm(dir); // 長さを1にする
+	dir.y = 0.0f;
+	dir = VNorm(dir);
 
-	// 弾を発射
+	// 弾生成
 	new Bullet3D(spawnPos, "Resource/3D/Bullet/EnemyBullet.mqo", dir, Team::Enemy);
 }
-
 // モデル同期（Character3D::SyncModel の実装）
 void Enemy3D::SyncModel()
 {
@@ -248,4 +269,39 @@ VECTOR Enemy3D::GetHitCenter() const
 float Enemy3D::GetRadius() const
 {
 	return Character3D::GetRadius();
+}
+
+void Enemy3D::UpdateRunner()
+{
+	if (m_type != Runner) return;
+
+	mfMoveTimer -= 1.0f;
+
+	// 一定時間ごとに新しい目標
+	if (mfMoveTimer <= 0.0f)
+	{
+		float angle = (float)(rand() % 360) * DX_PI / 180.0f;
+		float radius = (float)(rand() % 200);
+
+		mvTargetPosition.x = mvBasePosition.x + cosf(angle) * radius;
+		mvTargetPosition.z = mvBasePosition.z + sinf(angle) * radius;
+		mvTargetPosition.y = mvBasePosition.y;
+
+		mfMoveTimer = 120.0f;
+	}
+
+	// 目標までのベクトル
+	VECTOR toTarget = VSub(mvTargetPosition, mvPosition);
+	float dist = VSize(toTarget);
+
+	// 近すぎるなら止める
+	if (dist < 3.0f)
+	{
+		mvPosition = mvTargetPosition;
+		return;
+	}
+
+	// 移動（常に動かす・条件で止めない）
+	VECTOR dir = VNorm(toTarget);
+	mvPosition = VAdd(mvPosition, VScale(dir, 1.5f));
 }

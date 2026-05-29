@@ -13,7 +13,7 @@
 
 // コンストラクタ：Character3D の判定パラメータはここで調整する
 Player3D::Player3D(VECTOR initPos, std::string filename)
-	: Character3D(initPos, 50000, Team::Player, 30.0f) // maxHp, team, radius
+	: Character3D(initPos, 5, Team::Player, 30.0f) // maxHp, team, radius
 	, mfTargetAngle(0.0f)
 {
 	mpModel = new Model(filename, initPos);
@@ -56,6 +56,9 @@ Player3D::Player3D(VECTOR initPos, std::string filename)
 	mnHpBox = LoadGraph("Resource/2D/HpBox.png"); if (mnHpBox == -1) printfDx("画像ない");
 
 	SetFontSize(20);
+
+	this->mfAngle = 1.57f;
+	this->mfTargetAngle = 1.57f; // 移動方向の目標値も合わせておくとスムーズです
 }
 
 Player3D::~Player3D()
@@ -65,15 +68,8 @@ Player3D::~Player3D()
 
 void Player3D::Update()
 {
-	//// 落下したときは削除
-	//if (mvPosition.y < -3000.0f) SetDeleteFlag(true);
 
-	if (CheckHitKey(KEY_INPUT_1))
-	{
-		mvPosition = VGet(14000,3000,14000);
-		mfYVelocity = 0.0f;
-		mbIsGround = false;
-	}
+	// if (Master::mpCamera->GetStop()) return; // カメラが止まっているときは更新しない
 
 	mvOldPosition = mvPosition;
 
@@ -99,13 +95,13 @@ void Player3D::Update()
 void Player3D::Draw()
 {
 	// ここで共通デバッグ描画を呼ぶ（Character3D::DebugDraw）
-	DebugDraw();
+	// DebugDraw();
 
 	DrawHp(); // HPの描画呼び出し
 
 	// HP 表示など Player 固有の情報
-	DrawFormatString(0, 40, GetColor(255,255,0), "HP: %d", m_hp);
-	DrawFormatString(0, 10, GetColor(255,255,0), "%.1f, %.1f, %.1f", mvPosition.x, mvPosition.y, mvPosition.z);
+	//DrawFormatString(0, 40, GetColor(255,255,0), "HP: %d", m_hp);
+	//DrawFormatString(0, 10, GetColor(255,255,0), "%.1f, %.1f, %.1f", mvPosition.x, mvPosition.y, mvPosition.z);
 
 
 	if (mpModel) mpModel->Draw();
@@ -224,7 +220,7 @@ void Player3D::MoveEx()
 	// Shift押下でスピードアップ
 	if (CheckHitKey(KEY_INPUT_LSHIFT))
 	{
-		speed *= 4.0f; // デバッグ用倍率
+		speed *= 1.5f; // デバッグ用倍率 は4
 	}
 
 	const float dt = 1.0f / 60.0f; // デルタタイム

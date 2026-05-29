@@ -46,6 +46,8 @@ private:
 	float mfGoalRadius = 150.0f; // ゴールの当たり判定用半径
 	VECTOR mvGoalPosition; // ゴールの座標
 
+	int mnOptionHandle = -1; // 画像ハンドル オプションの画像
+
 };
 
 

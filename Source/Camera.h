@@ -32,6 +32,10 @@ public:
 	bool GetTitleMode() const { return mbTitleMode; }
 	void SetTitleMode(bool titleMode) { mbTitleMode = titleMode; }
 
+	// 停止の有無
+	bool GetStop() const { return mbStop; }
+	void SetStop(bool stop) { mbStop = stop; }
+
 
 	// ★New★
 	// 画面揺れ
@@ -76,6 +80,8 @@ private:
 
 
 	bool mbTitleMode; // タイトルモードか
+
+	bool mbStop; // 停止するか;
 };
 
 

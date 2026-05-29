@@ -206,7 +206,7 @@ bool Stage::CheckHit_Capsule(VECTOR pos1, VECTOR pos2, float r)
 	{
 		for (int i = 0; i < result.HitNum; ++i)
 		{
-			DrawTriangle3D(result.Dim[i].Position[0], result.Dim[i].Position[1], result.Dim[i].Position[2], GetColor(255, 0, 0), 0);
+			//DrawTriangle3D(result.Dim[i].Position[0], result.Dim[i].Position[1], result.Dim[i].Position[2], GetColor(255, 0, 0), 0);
 		}
 	}
 	MV1CollResultPolyDimTerminate(result);

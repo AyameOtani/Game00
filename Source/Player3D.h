@@ -32,8 +32,7 @@ public:
 	void SyncModel() override;
 
 public:
-	bool IsMarkedForDelete() const { return mbMarkedForDelete; }
-
+	float GetAngle() const { return mfAngle; }
 private:
 	Model* mpModel = nullptr;
 

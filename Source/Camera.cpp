@@ -125,6 +125,9 @@ void Camera::Update()
 
 void Camera::UpdateRotation()
 {
+	if (mbStop) return;
+
+
 	{
 		int StickX, StickY;
 		GetJoypadAnalogInputRight(&StickX, &StickY, DX_INPUT_PAD1);
@@ -227,6 +230,8 @@ void Camera::Reset()
 	mfVerticalAngle = 0.0f;
 	mpTarget = nullptr;
 	mpTargetEnemy = nullptr;
+
+	mfHorizontalAngle = -90.0f; // 角度設定　これはステージのせいだ
 
 	// カメラを反映
 	SetCameraPositionAndTarget_UpVecY(mvPosition, mvLookAtPosition);
