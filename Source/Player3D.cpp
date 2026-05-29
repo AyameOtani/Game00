@@ -97,7 +97,7 @@ void Player3D::Draw()
 	// ここで共通デバッグ描画を呼ぶ（Character3D::DebugDraw）
 	// DebugDraw();
 
-	DrawHp(); // HPの描画呼び出し
+	//DrawHp(); // HPの描画呼び出し  GameSceneに移動した
 
 	// HP 表示など Player 固有の情報
 	//DrawFormatString(0, 40, GetColor(255,255,0), "HP: %d", m_hp);
